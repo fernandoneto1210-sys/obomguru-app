@@ -47,4 +47,164 @@
   <script type="module" src="js/admin.js"></script>
 </body>
 </html>
+    <section class="admin-section">
+      <h2>Cadastrar Roteiro da Viagem</h2>
+      <form id="form-roteiro">
+        <div class="form-group">
+          <label for="roteiro-viagem">Selecione a viagem</label>
+          <select id="roteiro-viagem" name="viagem_id" required>
+            <!-- preenchido via JS -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="roteiro-dia">Dia</label>
+          <input type="number" id="roteiro-dia" name="dia" min="1" required>
+        </div>
+
+        <div class="form-group">
+          <label for="roteiro-titulo">Título do dia</label>
+          <input type="text" id="roteiro-titulo" name="titulo" required>
+        </div>
+
+        <div class="form-group">
+          <label for="roteiro-descricao">Descrição detalhada</label>
+          <textarea id="roteiro-descricao" name="descricao" rows="4" required></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary">Salvar dia do roteiro</button>
+      </form>
+    </section>
+
+    <section class="admin-section">
+      <h2>Cadastrar Documentos da Viagem</h2>
+      <form id="form-documentos">
+        <div class="form-group">
+          <label for="documentos-viagem">Selecione a viagem</label>
+          <select id="documentos-viagem" name="viagem_id" required>
+            <!-- preenchido via JS -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="documento-tipo">Tipo de documento</label>
+          <select id="documento-tipo" name="tipo" required>
+            <option value="Passaporte">Passaporte</option>
+            <option value="Visto">Visto</option>
+            <option value="Seguro">Seguro</option>
+            <option value="Voucher">Voucher</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="documento-nome">Nome</label>
+          <input type="text" id="documento-nome" name="nome" required>
+        </div>
+
+        <div class="form-group">
+          <label for="documento-link">Link/URL (opcional)</label>
+          <input type="url" id="documento-link" name="link" placeholder="https://...">
+        </div>
+
+        <div class="form-group">
+          <label for="documento-observacoes">Observações (opcional)</label>
+          <textarea id="documento-observacoes" name="observacoes" rows="3"></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary">Salvar documento</button>
+      </form>
+    </section>
+
+    <section class="admin-section">
+      <h2>Cadastrar Contatos da Viagem</h2>
+      <form id="form-contatos">
+        <div class="form-group">
+          <label for="contatos-viagem">Selecione a viagem</label>
+          <select id="contatos-viagem" name="viagem_id" required>
+            <!-- preenchido via JS -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="contato-tipo">Tipo de contato</label>
+          <select id="contato-tipo" name="tipo" required>
+            <option value="Guia">Guia</option>
+            <option value="Hotel">Hotel</option>
+            <option value="Emergência">Emergência</option>
+            <option value="Restaurante">Restaurante</option>
+            <option value="Transporte">Transporte</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="contato-nome">Nome</label>
+          <input type="text" id="contato-nome" name="nome" required>
+        </div>
+
+        <div class="form-group">
+          <label for="contato-telefone">Telefone</label>
+          <input type="text" id="contato-telefone" name="telefone" placeholder="+55 35 99999-9999">
+        </div>
+
+        <div class="form-group">
+          <label for="contato-email">E-mail</label>
+          <input type="email" id="contato-email" name="email" placeholder="contato@exemplo.com">
+        </div>
+
+        <div class="form-group">
+          <label for="contato-observacoes">Observações (opcional)</label>
+          <textarea id="contato-observacoes" name="observacoes" rows="3"></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary">Salvar contato</button>
+      </form>
+    </section>
+
+    <section class="admin-section">
+      <h2>Cadastrar Alertas da Viagem</h2>
+      <form id="form-alertas">
+        <div class="form-group">
+          <label for="alertas-viagem">Selecione a viagem</label>
+          <select id="alertas-viagem" name="viagem_id" required>
+            <!-- preenchido via JS -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="alerta-tipo">Tipo de alerta</label>
+          <select id="alerta-tipo" name="tipo" required>
+            <option value="Clima">Clima</option>
+            <option value="Documentação">Documentação</option>
+            <option value="Saúde">Saúde</option>
+            <option value="Segurança">Segurança</option>
+            <option value="Moeda">Moeda</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="alerta-titulo">Título</label>
+          <input type="text" id="alerta-titulo" name="titulo" required>
+        </div>
+
+        <div class="form-group">
+          <label for="alerta-mensagem">Mensagem</label>
+          <textarea id="alerta-mensagem" name="mensagem" rows="4" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="alerta-prioridade">Prioridade</label>
+          <select id="alerta-prioridade" name="prioridade">
+            <option value="baixa">Baixa</option>
+            <option value="normal" selected>Normal</option>
+            <option value="alta">Alta</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-primary">Salvar alerta</button>
+      </form>
+    </section>
+
 
