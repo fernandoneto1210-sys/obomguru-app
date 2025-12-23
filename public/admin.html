@@ -3,51 +3,109 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel Admin – ObomGuru</title>
+  <title>Painel Admin - ObomGuru</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header class="header">
-    <img src="img/logo.png" alt="ObomGuru" class="logo">
-    <h1>Painel Administrativo</h1>
+
+  <!-- ========================================
+       HEADER
+       ======================================== -->
+  <header>
+    <div class="container">
+      <a href="index.html">
+        <img src="img/logo.png" alt="ObomGuru" class="logo">
+      </a>
+      <nav>
+        <a href="index.html">Início</a>
+        <a href="admin.html" class="active">Admin</a>
+      </nav>
+    </div>
   </header>
 
-  <section class="admin-container">
-    <h2>Cadastrar Novo Destino</h2>
-    <form id="formDestino">
-      <input type="text" name="nome" placeholder="Nome do destino (ex: Buenos Aires)" required>
-      <input type="text" name="pais" placeholder="País" required>
-      <input type="text" name="moeda" placeholder="Moeda (ex: ARS)" required>
-      <input type="text" name="simbolo" placeholder="Símbolo (ex: $)" required>
-      <textarea name="dicas" placeholder="Dicas gerais do destino" rows="4"></textarea>
-      <input type="url" name="imagem" placeholder="URL da imagem de capa">
-      <button type="submit">Salvar Destino</button>
-    </form>
+  <!-- ========================================
+       MAIN - CONTEÚDO PRINCIPAL
+       ======================================== -->
+  <main class="container">
 
-    <hr>
+    <h1>Painel Administrativo</h1>
+    <p>Gerencie destinos, viagens, roteiros, documentos, contatos e alertas.</p>
 
-    <h2>Cadastrar Nova Viagem (Grupo)</h2>
-    <form id="formViagem">
-      <select name="destino" id="selectDestino" required>
-        <option value="">Selecione o destino</option>
-      </select>
-      <input type="text" name="nomeViagem" placeholder="Nome do grupo (ex: Buenos Aires Família – Mar/2025)" required>
-      <input type="date" name="dataSaida" required>
-      <input type="date" name="dataRetorno" required>
-      <button type="submit">Criar Viagem</button>
-    </form>
+    <!-- ========================================
+         SEÇÃO 1: CADASTRAR DESTINO
+         ======================================== -->
+    <section class="admin-section">
+      <h2>Cadastrar Novo Destino</h2>
+      <form id="form-destino">
+        <div class="form-group">
+          <label for="nome">Nome do destino</label>
+          <input type="text" id="nome" name="nome" required placeholder="Ex: Buenos Aires">
+        </div>
 
-    <p id="linkViagem"></p>
-  </section>
+        <div class="form-group">
+          <label for="pais">País</label>
+          <input type="text" id="pais" name="pais" required placeholder="Ex: Argentina">
+        </div>
 
-  <footer class="footer">
-    <p>© 2025 ObomGuru</p>
-  </footer>
+        <div class="form-group">
+          <label for="moeda">Moeda</label>
+          <input type="text" id="moeda" name="moeda" required placeholder="Ex: Peso Argentino">
+        </div>
 
-   </section>
-    <script type="module" src="js/admin.js"></script>
-  </body>
-</html>
+        <div class="form-group">
+          <label for="simbolo_moeda">Símbolo da moeda</label>
+          <input type="text" id="simbolo_moeda" name="simbolo_moeda" required placeholder="Ex: $">
+        </div>
+
+        <div class="form-group">
+          <label for="dicas_gerais">Dicas gerais</label>
+          <textarea id="dicas_gerais" name="dicas_gerais" rows="4" required placeholder="Dicas sobre o destino..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="imagem_capa_url">URL da imagem de capa</label>
+          <input type="url" id="imagem_capa_url" name="imagem_capa_url" placeholder="https://...">
+        </div>
+
+        <button type="submit" class="btn-primary">Salvar Destino</button>
+      </form>
+    </section>
+
+    <!-- ========================================
+         SEÇÃO 2: CADASTRAR VIAGEM
+         ======================================== -->
+    <section class="admin-section">
+      <h2>Cadastrar Nova Viagem (Grupo)</h2>
+      <form id="form-viagem">
+        <div class="form-group">
+          <label for="destino">Selecione o destino</label>
+          <select id="destino" name="destino" required>
+            <!-- preenchido via JS -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="nome_viagem">Nome da viagem</label>
+          <input type="text" id="nome_viagem" name="nome_viagem" required placeholder="Ex: Buenos Aires Família – Março 2025">
+        </div>
+
+        <div class="form-group">
+          <label for="data_saida">Data de saída</label>
+          <input type="date" id="data_saida" name="data_saida">
+        </div>
+
+        <div class="form-group">
+          <label for="data_retorno">Data de retorno</label>
+          <input type="date" id="data_retorno" name="data_retorno">
+        </div>
+
+        <button type="submit" class="btn-primary">Criar Viagem</button>
+      </form>
+    </section>
+
+    <!-- ========================================
+         SEÇÃO 3: CADASTRAR ROTEIRO
+         ======================================== -->
     <section class="admin-section">
       <h2>Cadastrar Roteiro da Viagem</h2>
       <form id="form-roteiro">
@@ -60,23 +118,26 @@
 
         <div class="form-group">
           <label for="roteiro-dia">Dia</label>
-          <input type="number" id="roteiro-dia" name="dia" min="1" required>
+          <input type="number" id="roteiro-dia" name="dia" min="1" required placeholder="1">
         </div>
 
         <div class="form-group">
           <label for="roteiro-titulo">Título do dia</label>
-          <input type="text" id="roteiro-titulo" name="titulo" required>
+          <input type="text" id="roteiro-titulo" name="titulo" required placeholder="Ex: Chegada em Buenos Aires">
         </div>
 
         <div class="form-group">
           <label for="roteiro-descricao">Descrição detalhada</label>
-          <textarea id="roteiro-descricao" name="descricao" rows="4" required></textarea>
+          <textarea id="roteiro-descricao" name="descricao" rows="4" required placeholder="Descreva as atividades do dia..."></textarea>
         </div>
 
         <button type="submit" class="btn-primary">Salvar dia do roteiro</button>
       </form>
     </section>
 
+    <!-- ========================================
+         SEÇÃO 4: CADASTRAR DOCUMENTOS
+         ======================================== -->
     <section class="admin-section">
       <h2>Cadastrar Documentos da Viagem</h2>
       <form id="form-documentos">
@@ -100,7 +161,7 @@
 
         <div class="form-group">
           <label for="documento-nome">Nome</label>
-          <input type="text" id="documento-nome" name="nome" required>
+          <input type="text" id="documento-nome" name="nome" required placeholder="Ex: Passaporte válido">
         </div>
 
         <div class="form-group">
@@ -110,13 +171,16 @@
 
         <div class="form-group">
           <label for="documento-observacoes">Observações (opcional)</label>
-          <textarea id="documento-observacoes" name="observacoes" rows="3"></textarea>
+          <textarea id="documento-observacoes" name="observacoes" rows="3" placeholder="Informações adicionais..."></textarea>
         </div>
 
         <button type="submit" class="btn-primary">Salvar documento</button>
       </form>
     </section>
 
+    <!-- ========================================
+         SEÇÃO 5: CADASTRAR CONTATOS
+         ======================================== -->
     <section class="admin-section">
       <h2>Cadastrar Contatos da Viagem</h2>
       <form id="form-contatos">
@@ -141,7 +205,7 @@
 
         <div class="form-group">
           <label for="contato-nome">Nome</label>
-          <input type="text" id="contato-nome" name="nome" required>
+          <input type="text" id="contato-nome" name="nome" required placeholder="Ex: João Silva">
         </div>
 
         <div class="form-group">
@@ -156,57 +220,20 @@
 
         <div class="form-group">
           <label for="contato-observacoes">Observações (opcional)</label>
-          <textarea id="contato-observacoes" name="observacoes" rows="3"></textarea>
+          <textarea id="contato-observacoes" name="observacoes" rows="3" placeholder="Informações adicionais..."></textarea>
         </div>
 
         <button type="submit" class="btn-primary">Salvar contato</button>
       </form>
     </section>
 
+    <!-- ========================================
+         SEÇÃO 6: CADASTRAR ALERTAS
+         ======================================== -->
     <section class="admin-section">
       <h2>Cadastrar Alertas da Viagem</h2>
       <form id="form-alertas">
-        <div class="form-group">
-          <label for="alertas-viagem">Selecione a viagem</label>
-          <select id="alertas-viagem" name="viagem_id" required>
-            <!-- preenchido via JS -->
-          </select>
-        </div>
+        <div class="# 🎯 ADMIN.HTML COMPLETO — CORRIGIDO E ORGANIZADO
 
-        <div class="form-group">
-          <label for="alerta-tipo">Tipo de alerta</label>
-          <select id="alerta-tipo" name="tipo" required>
-            <option value="Clima">Clima</option>
-            <option value="Documentação">Documentação</option>
-            <option value="Saúde">Saúde</option>
-            <option value="Segurança">Segurança</option>
-            <option value="Moeda">Moeda</option>
-            <option value="Outro">Outro</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="alerta-titulo">Título</label>
-          <input type="text" id="alerta-titulo" name="titulo" required>
-        </div>
-
-        <div class="form-group">
-          <label for="alerta-mensagem">Mensagem</label>
-          <textarea id="alerta-mensagem" name="mensagem" rows="4" required></textarea>
-        </div>
-
-        <div class="form-group">
-          <label for="alerta-prioridade">Prioridade</label>
-          <select id="alerta-prioridade" name="prioridade">
-            <option value="baixa">Baixa</option>
-            <option value="normal" selected>Normal</option>
-            <option value="alta">Alta</option>
-          </select>
-        </div>
-
-        <button type="submit" class="btn-primary">Salvar alerta</button>
-      </form>
-    </section>
-
-
+Copie **TODO** este código e substitua **completamente** o arquivo `public/admin.html`:
 
