@@ -56,10 +56,10 @@ async function carregarViagensNosSelects() {
     data.forEach(viagem => {
       const opt = document.createElement('option');
       const saida = viagem.data_saida
-        ? new Date(viagem.data_saida + 'T00:00:00').toLocaleDateString('pt-BR')
+        ? formatarDataISO(viagem.data_saida)
         : '';
       const retorno = viagem.data_retorno
-        ? new Date(viagem.data_retorno + 'T00:00:00').toLocaleDateString('pt-BR')
+        ? formatarDataISO(viagem.data_retorno)
         : '';
       opt.value = viagem.id;
       opt.textContent = `${viagem.nome_viagem} (${saida} → ${retorno})`;
@@ -69,7 +69,16 @@ async function carregarViagensNosSelects() {
 }
 
 // ========================================
-// SALVAR DESTINO
+// FORMATAR DATA ISO
+// ========================================
+function formatarDataISO(dataISO) {
+  if (!dataISO) return '';
+  const [ano, mes, dia] = dataISO.split('-');
+  return `${dia}/${mes}/${ano}`;
+}
+
+// ========================================
+// SALVAR DESTINO (AGORA COM OS NOVOS CAMPOS)
 // ========================================
 async function salvarDestino(event) {
   event.preventDefault();
@@ -78,9 +87,9 @@ async function salvarDestino(event) {
   const payload = {
     nome: form.nome.value.trim(),
     pais: form.pais.value.trim(),
-    moeda: form.moeda.value.trim(),
-    simbolo_moeda: form.simbolo_moeda.value.trim(),
-    dicas_gerais: form.dicas_gerais.value.trim(),
+    moeda: form.moeda.value.trim() || null,
+    simbolo_moeda: form.simbolo_moeda.value.trim() || null,
+    dicas_gerais: form.dicas_gerais.value.trim() || null,
     imagem_capa_url: form.imagem_capa_url.value.trim() || null
   };
 
@@ -98,28 +107,20 @@ async function salvarDestino(event) {
 }
 
 // ========================================
-// SALVAR VIAGEM (CORRIGIDO PARA ISO)
+// SALVAR VIAGEM
 // ========================================
 async function salvarViagem(event) {
   event.preventDefault();
   const form = event.target;
 
-  // Garantir que as datas estejam no formato ISO (YYYY-MM-DD)
-  const dataSaida = form.data_saida.value; // já vem no formato correto do input type="date"
-  const dataRetorno = form.data_retorno.value;
-
   const payload = {
     destino_id: form.destino.value,
     nome_viagem: form.nome_viagem.value.trim(),
-    data_saida: dataSaida || null,
-    data_retorno: dataRetorno || null
+    data_saida: form.data_saida.value || null,
+    data_retorno: form.data_retorno.value || null
   };
 
-  const { data, error } = await supabase
-    .from('viagens')
-    .insert(payload)
-    .select('id')
-    .single();
+  const { error } = await supabase.from('viagens').insert(payload);
 
   if (error) {
     console.error('Erro ao salvar viagem:', error);
@@ -127,14 +128,13 @@ async function salvarViagem(event) {
     return;
   }
 
-  const url = `${window.location.origin}/viagem.html?id=${data.id}`;
-  alert(`Viagem criada com sucesso!\n\nLink para enviar ao cliente:\n${url}`);
+  alert('Viagem criada com sucesso!');
   form.reset();
   await carregarViagensNosSelects();
 }
 
 // ========================================
-// SALVAR DIA DO ROTEIRO
+// SALVAR ROTEIRO
 // ========================================
 async function salvarRoteiro(event) {
   event.preventDefault();
@@ -142,7 +142,7 @@ async function salvarRoteiro(event) {
 
   const payload = {
     viagem_id: form.viagem_id.value,
-    dia: Number(form.dia.value),
+    dia: parseInt(form.dia.value),
     titulo: form.titulo.value.trim(),
     descricao: form.descricao.value.trim()
   };
@@ -150,8 +150,8 @@ async function salvarRoteiro(event) {
   const { error } = await supabase.from('roteiro_dias').insert(payload);
 
   if (error) {
-    console.error('Erro ao salvar dia do roteiro:', error);
-    alert('Erro ao salvar dia do roteiro.');
+    console.error('Erro ao salvar roteiro:', error);
+    alert('Erro ao salvar roteiro.');
     return;
   }
 
