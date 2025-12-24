@@ -3,38 +3,92 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Minha Viagem – ObomGuru</title>
+  <title>Detalhes da Viagem - ObomGuru</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header class="header">
-    <img src="img/logo.png" alt="ObomGuru" class="logo">
-    <h1 id="tituloViagem">Carregando...</h1>
+
+  <!-- HEADER -->
+  <header>
+    <div class="container">
+      <a href="index.html">
+        <img src="img/logo.png" alt="ObomGuru" class="logo">
+      </a>
+      <nav>
+        <a href="index.html">Início</a>
+        <a href="admin.html">Admin</a>
+      </nav>
+    </div>
   </header>
 
-  <section class="viagem-container">
-    <div class="info-basica" id="infoBasica"></div>
+  <!-- MAIN CONTENT -->
+  <main class="container">
 
-    <h2>Roteiro Dia a Dia</h2>
-    <div id="roteiro"></div>
+    <!-- INFORMAÇÕES DA VIAGEM -->
+    <section class="viagem-header">
+      <h1 id="viagem-titulo">Carregando...</h1>
+      <div class="viagem-info">
+        <p><strong>Destino:</strong> <span id="viagem-destino">—</span></p>
+        <p><strong>Datas:</strong> <span id="viagem-datas">—</span></p>
+        <p><strong>Moeda:</strong> <span id="viagem-moeda">—</span></p>
+      </div>
+      <img id="viagem-imagem" src="" alt="" style="max-width: 100%; border-radius: 8px; margin-top: 20px; display: none;">
+    </section>
 
-    <h2>Documentos</h2>
-    <div id="documentos"></div>
+    <!-- DICAS DO DESTINO -->
+    <section class="viagem-section">
+      <h2>📍 Sobre o Destino</h2>
+      <p id="viagem-dicas">—</p>
+    </section>
 
-    <h2>Contatos Importantes</h2>
-    <div id="contatos"></div>
+    <!-- ROTEIRO -->
+    <section class="viagem-section">
+      <h2>🗓️ Roteiro Detalhado</h2>
+      <div id="roteiro-lista">
+        <p>Carregando roteiro...</p>
+      </div>
+    </section>
 
-    <h2>Alertas de Horários</h2>
-    <div id="alertas"></div>
+    <!-- DOCUMENTOS -->
+    <section class="viagem-section">
+      <h2>📄 Documentos Necessários</h2>
+      <div id="documentos-lista">
+        <p>Carregando documentos...</p>
+      </div>
+    </section>
 
-    <button id="btnPdf" class="btn-pdf">Baixar PDF Completo</button>
-  </section>
+    <!-- CONTATOS -->
+    <section class="viagem-section">
+      <h2>📞 Contatos Importantes</h2>
+      <div id="contatos-lista">
+        <p>Carregando contatos...</p>
+      </div>
+    </section>
 
-  <footer class="footer">
-    <p>© 2025 ObomGuru</p>
+    <!-- ALERTAS -->
+    <section class="viagem-section">
+      <h2>⚠️ Alertas e Avisos</h2>
+      <div id="alertas-lista">
+        <p>Carregando alertas...</p>
+      </div>
+    </section>
+
+    <!-- BOTÃO BAIXAR PDF -->
+    <section class="viagem-section" style="text-align: center;">
+      <button class="btn-primary" onclick="alert('Função de PDF em desenvolvimento')">
+        📥 Baixar PDF Completo da Viagem
+      </button>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2025 ObomGuru</p>
   </footer>
 
+  <!-- JAVASCRIPT -->
   <script type="module" src="js/viagem.js"></script>
+
 </body>
 </html>
-
