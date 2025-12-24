@@ -5,12 +5,220 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - ObomGuru</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ========================================
+       ESTILOS ESPECÍFICOS DO ADMIN
+       ======================================== */
+
+    .admin-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .admin-header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 30px;
+      background: linear-gradient(135deg, #2d5016 0%, #4a7c2a 100%);
+      border-radius: 12px;
+      color: white;
+    }
+
+    .admin-header h1 {
+      margin: 0 0 10px 0;
+      font-size: 2rem;
+    }
+
+    .admin-header p {
+      margin: 0;
+      opacity: 0.9;
+    }
+
+    /* SEÇÕES COLAPSÁVEIS */
+    .admin-section {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .admin-section:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    .section-header {
+      background: #f5f5f5;
+      padding: 20px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #e0e0e0;
+      transition: background 0.3s ease;
+    }
+
+    .section-header:hover {
+      background: #ebebeb;
+    }
+
+    .section-header h2 {
+      margin: 0;
+      color: #2d5016;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-icon {
+      font-size: 1.5rem;
+    }
+
+    .section-toggle {
+      font-size: 1.5rem;
+      color: #666;
+      transition: transform 0.3s ease;
+    }
+
+    .section-content {
+      padding: 30px;
+      display: none;
+    }
+
+    .section-content.active {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* FORMULÁRIOS */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #2d5016;
+      box-shadow: 0 0 0 3px rgba(45, 80, 22, 0.1);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    /* BOTÕES */
+    .btn-primary {
+      background: linear-gradient(135deg, #2d5016 0%, #4a7c2a 100%);
+      color: white;
+      padding: 14px 30px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(45, 80, 22, 0.3);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    /* MENSAGENS DE FEEDBACK */
+    .feedback-message {
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+      animation: slideDown 0.3s ease;
+    }
+
+    .feedback-message.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      display: block;
+    }
+
+    .feedback-message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+      display: block;
+    }
+
+    /* GRID DE 2 COLUNAS */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    /* RESPONSIVO */
+    @media (max-width: 768px) {
+      .admin-header h1 {
+        font-size: 1.5rem;
+      }
+
+      .section-header h2 {
+        font-size: 1.1rem;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .section-content {
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
 
-  <!-- ========================================
-       HEADER
-       ======================================== -->
+  <!-- HEADER -->
   <header>
     <div class="container">
       <a href="index.html">
@@ -23,217 +231,301 @@
     </div>
   </header>
 
-  <!-- ========================================
-       MAIN - CONTEÚDO PRINCIPAL
-       ======================================== -->
-  <main class="container">
+  <!-- MAIN CONTENT -->
+  <main class="admin-container">
 
-    <h1>Painel Administrativo</h1>
-    <p>Gerencie destinos, viagens, roteiros, documentos, contatos e alertas.</p>
+    <!-- CABEÇALHO DO ADMIN -->
+    <div class="admin-header">
+      <h1>🎯 Painel Administrativo</h1>
+      <p>Gerencie destinos, viagens, roteiros, documentos, contatos e alertas</p>
+    </div>
 
-    <!-- ========================================
-         SEÇÃO 1: CADASTRAR DESTINO
-         ======================================== -->
+    <!-- MENSAGEM DE FEEDBACK -->
+    <div id="feedback" class="feedback-message"></div>
+
+    <!-- SEÇÃO 1: CADASTRAR DESTINO -->
     <section class="admin-section">
-      <h2>Cadastrar Novo Destino</h2>
-      <form id="form-destino">
-        <div class="form-group">
-          <label for="nome">Nome do destino</label>
-          <input type="text" id="nome" name="nome" required placeholder="Ex: Buenos Aires">
-        </div>
+      <div class="section-header" onclick="toggleSection(this)">
+        <h2><span class="section-icon">🌍</span> Cadastrar Novo Destino</h2>
+        <span class="section-toggle">▼</span>
+      </div>
+      <div class="section-content">
+        <form id="form-destino">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nome">Nome do destino *</label>
+              <input type="text" id="nome" name="nome" required placeholder="Ex: Buenos Aires">
+            </div>
 
-        <div class="form-group">
-          <label for="pais">País</label>
-          <input type="text" id="pais" name="pais" required placeholder="Ex: Argentina">
-        </div>
+            <div class="form-group">
+              <label for="pais">País *</label>
+              <input type="text" id="pais" name="pais" required placeholder="Ex: Argentina">
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label for="moeda">Moeda</label>
-          <input type="text" id="moeda" name="moeda" required placeholder="Ex: Peso Argentino">
-        </div>
-
-        <div class="form-group">
-          <label for="simbolo_moeda">Símbolo da moeda</label>
-          <input type="text" id="simbolo_moeda" name="simbolo_moeda" required placeholder="Ex: $">
-        </div>
-
-        <div class="form-group">
-          <label for="dicas_gerais">Dicas gerais</label>
-          <textarea id="dicas_gerais" name="dicas_gerais" rows="4" required placeholder="Dicas sobre o destino..."></textarea>
-        </div>
-
-        <div class="form-group">
-          <label for="imagem_capa_url">URL da imagem de capa</label>
-          <input type="url" id="imagem_capa_url" name="imagem_capa_url" placeholder="https://...">
-        </div>
-
-        <button type="submit" class="btn-primary">Salvar Destino</button>
-      </form>
+          <button type="submit" class="btn-primary">💾 Salvar Destino</button>
+        </form>
+      </div>
     </section>
 
-    <!-- ========================================
-         SEÇÃO 2: CADASTRAR VIAGEM
-         ======================================== -->
+    <!-- SEÇÃO 2: CADASTRAR VIAGEM -->
     <section class="admin-section">
-      <h2>Cadastrar Nova Viagem (Grupo)</h2>
-      <form id="form-viagem">
-        <div class="form-group">
-          <label for="destino">Selecione o destino</label>
-          <select id="destino" name="destino" required>
-            <!-- preenchido via JS -->
-          </select>
-        </div>
+      <div class="section-header" onclick="toggleSection(this)">
+        <h2><span class="section-icon">✈️</span> Cadastrar Nova Viagem (Grupo)</h2>
+        <span class="section-toggle">▼</span>
+      </div>
+      <div class="section-content">
+        <form id="form-viagem">
+          <div class="form-group">
+            <label for="destino">Selecione o destino *</label>
+            <select id="destino" name="destino" required>
+              <option value="">Carregando...</option>
+            </select>
+          </div>
 
-        <div class="form-group">
-          <label for="nome_viagem">Nome da viagem</label>
-          <input type="text" id="nome_viagem" name="nome_viagem" required placeholder="Ex: Buenos Aires Família – Março 2025">
-        </div>
+          <div class="form-group">
+            <label for="nome_viagem">Nome da viagem *</label>
+            <input type="text" id="nome_viagem" name="nome_viagem" required placeholder="Ex: Buenos Aires Família – Março 2025">
+          </div>
 
-        <div class="form-group">
-          <label for="data_saida">Data de saída</label>
-          <input type="date" id="data_saida" name="data_saida">
-        </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="data_saida">Data de saída</label>
+              <input type="date" id="data_saida" name="data_saida">
+            </div>
 
-        <div class="form-group">
-          <label for="data_retorno">Data de retorno</label>
-          <input type="date" id="data_retorno" name="data_retorno">
-        </div>
+            <div class="form-group">
+              <label for="data_retorno">Data de retorno</label>
+              <input type="date" id="data_retorno" name="data_retorno">
+            </div>
+          </div>
 
-        <button type="submit" class="btn-primary">Criar Viagem</button>
-      </form>
+          <button type="submit" class="btn-primary">🚀 Criar Viagem</button>
+        </form>
+      </div>
     </section>
 
-    <!-- ========================================
-         SEÇÃO 3: CADASTRAR ROTEIRO
-         ======================================== -->
+    <!-- SEÇÃO 3: CADASTRAR ROTEIRO -->
     <section class="admin-section">
-      <h2>Cadastrar Roteiro da Viagem</h2>
-      <form id="form-roteiro">
-        <div class="form-group">
-          <label for="roteiro-viagem">Selecione a viagem</label>
-          <select id="roteiro-viagem" name="viagem_id" required>
-            <!-- preenchido via JS -->
-          </select>
-        </div>
+      <div class="section-header" onclick="toggleSection(this)">
+        <h2><span class="section-icon">📅</span> Cadastrar Roteiro da Viagem</h2>
+        <span class="section-toggle">▼</span>
+      </div>
+      <div class="section-content">
+        <form id="form-roteiro">
+          <div class="form-group">
+            <label for="roteiro-viagem">Selecione a viagem *</label>
+            <select id="roteiro-viagem" name="viagem_id" required>
+              <option value="">Carregando...</option>
+            </select>
+          </div>
 
-        <div class="form-group">
-          <label for="roteiro-dia">Dia</label>
-          <input type="number" id="roteiro-dia" name="dia" min="1" required placeholder="1">
-        </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="roteiro-dia">Dia *</label>
+              <input type="number" id="roteiro-dia" name="dia" min="1" required placeholder="1">
+            </div>
 
-        <div class="form-group">
-          <label for="roteiro-titulo">Título do dia</label>
-          <input type="text" id="roteiro-titulo" name="titulo" required placeholder="Ex: Chegada em Buenos Aires">
-        </div>
+            <div class="form-group">
+              <label for="roteiro-titulo">Título do dia *</label>
+              <input type="text" id="roteiro-titulo" name="titulo" required placeholder="Ex: Chegada em Buenos Aires">
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label for="roteiro-descricao">Descrição detalhada</label>
-          <textarea id="roteiro-descricao" name="descricao" rows="4" required placeholder="Descreva as atividades do dia..."></textarea>
-        </div>
+          <div class="form-group">
+            <label for="roteiro-descricao">Descrição detalhada *</label>
+            <textarea id="roteiro-descricao" name="descricao" rows="4" required placeholder="Descreva as atividades do dia..."></textarea>
+          </div>
 
-        <button type="submit" class="btn-primary">Salvar dia do roteiro</button>
-      </form>
+          <button type="submit" class="btn-primary">📝 Salvar dia do roteiro</button>
+        </form>
+      </div>
     </section>
 
-    <!-- ========================================
-         SEÇÃO 4: CADASTRAR DOCUMENTOS
-         ======================================== -->
+    <!-- SEÇÃO 4: CADASTRAR DOCUMENTOS -->
     <section class="admin-section">
-      <h2>Cadastrar Documentos da Viagem</h2>
-      <form id="form-documentos">
-        <div class="form-group">
-          <label for="documentos-viagem">Selecione a viagem</label>
-          <select id="documentos-viagem" name="viagem_id" required>
-            <!-- preenchido via JS -->
-          </select>
-        </div>
+      <div class="section-header" onclick="toggleSection(this)">
+        <h2><span class="section-icon">📄</span> Cadastrar Documentos da Viagem</h2>
+        <span class="section-toggle">▼</span>
+      </div>
+      <div class="section-content">
+        <form id="form-documentos">
+          <div class="form-group">
+            <label for="documentos-viagem">Selecione a viagem *</label>
+            <select id="documentos-viagem" name="viagem_id" required>
+              <option value="">Carregando...</option>
+            </select>
+          </div>
 
-        <div class="form-group">
-          <label for="documento-tipo">Tipo de documento</label>
-          <select id="documento-tipo" name="tipo" required>
-            <option value="Passaporte">Passaporte</option>
-            <option value="Visto">Visto</option>
-            <option value="Seguro">Seguro</option>
-            <option value="Voucher">Voucher</option>
-            <option value="Outro">Outro</option>
-          </select>
-        </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="documento-tipo">Tipo de documento *</label>
+              <select id="documento-tipo" name="tipo" required>
+                <option value="Passaporte">Passaporte</option>
+                <option value="Visto">Visto</option>
+                <option value="Seguro Viagem">Seguro Viagem</option>
+                <option value="Voucher">Voucher</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </div>
 
-        <div class="form-group">
-          <label for="documento-nome">Nome</label>
-          <input type="text" id="documento-nome" name="nome" required placeholder="Ex: Passaporte válido">
-        </div>
+            <div class="form-group">
+              <label for="documento-nome">Nome *</label>
+              <input type="text" id="documento-nome" name="nome" required placeholder="Ex: Passaporte válido">
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label for="documento-link">Link/URL (opcional)</label>
-          <input type="url" id="documento-link" name="link" placeholder="https://...">
-        </div>
+          <div class="form-group">
+            <label for="documento-link">Link/URL (opcional)</label>
+            <input type="url" id="documento-link" name="link" placeholder="https://...">
+          </div>
 
-        <div class="form-group">
-          <label for="documento-observacoes">Observações (opcional)</label>
-          <textarea id="documento-observacoes" name="observacoes" rows="3" placeholder="Informações adicionais..."></textarea>
-        </div>
+          <div class="form-group">
+            <label for="documento-observacoes">Observações (opcional)</label>
+            <textarea id="documento-observacoes" name="observacoes" rows="3" placeholder="Informações adicionais..."></textarea>
+          </div>
 
-        <button type="submit" class="btn-primary">Salvar documento</button>
-      </form>
+          <button type="submit" class="btn-primary">📎 Salvar documento</button>
+        </form>
+      </div>
     </section>
 
-    <!-- ========================================
-         SEÇÃO 5: CADASTRAR CONTATOS
-         ======================================== -->
+    <!-- SEÇÃO 5: CADASTRAR CONTATOS -->
     <section class="admin-section">
-      <h2>Cadastrar Contatos da Viagem</h2>
-      <form id="form-contatos">
-        <div class="form-group">
-          <label for="contatos-viagem">Selecione a viagem</label>
-          <select id="contatos-viagem" name="viagem_id" required>
-            <!-- preenchido via JS -->
-          </select>
-        </div>
+      <div class="section-header" onclick="toggleSection(this)">
+        <h2><span class="section-icon">📞</span> Cadastrar Contatos da Viagem</h2>
+        <span class="section-toggle">▼</span>
+      </div>
+      <div class="section-content">
+        <form id="form-contatos">
+          <div class="form-group">
+            <label for="contatos-viagem">Selecione a viagem *</label>
+            <select id="contatos-viagem" name="viagem_id" required>
+              <option value="">Carregando...</option>
+            </select>
+          </div>
 
-        <div class="form-group">
-          <label for="contato-tipo">Tipo de contato</label>
-          <select id="contato-tipo" name="tipo" required>
-            <option value="Guia">Guia</option>
-            <option value="Hotel">Hotel</option>
-            <option value="Emergência">Emergência</option>
-            <option value="Restaurante">Restaurante</option>
-            <option value="Transporte">Transporte</option>
-            <option value="Outro">Outro</option>
-          </select>
-        </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="contato-tipo">Tipo de contato *</label>
+              <select id="contato-tipo" name="tipo" required>
+                <option value="Guia">Guia</option>
+                <option value="Hotel">Hotel</option>
+                <option value="Emergência">Emergência</option>
+                <option value="Restaurante">Restaurante</option>
+                <option value="Transporte">Transporte</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </div>
 
-        <div class="form-group">
-          <label for="contato-nome">Nome</label>
-          <input type="text" id="contato-nome" name="nome" required placeholder="Ex: João Silva">
-        </div>
+            <div class="form-group">
+              <label for="contato-nome">Nome *</label>
+              <input type="text" id="contato-nome" name="nome" required placeholder="Ex: João Silva">
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label for="contato-telefone">Telefone</label>
-          <input type="text" id="contato-telefone" name="telefone" placeholder="+55 35 99999-9999">
-        </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="contato-telefone">Telefone</label>
+              <input type="text" id="contato-telefone" name="telefone" placeholder="+55 35 99999-9999">
+            </div>
 
-        <div class="form-group">
-          <label for="contato-email">E-mail</label>
-          <input type="email" id="contato-email" name="email" placeholder="contato@exemplo.com">
-        </div>
+            <div class="form-group">
+              <label for="contato-email">E-mail</label>
+              <input type="email" id="contato-email" name="email" placeholder="contato@exemplo.com">
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label for="contato-observacoes">Observações (opcional)</label>
-          <textarea id="contato-observacoes" name="observacoes" rows="3" placeholder="Informações adicionais..."></textarea>
-        </div>
+          <div class="form-group">
+            <label for="contato-observacoes">Observações (opcional)</label>
+            <textarea id="contato-observacoes" name="observacoes" rows="3" placeholder="Informações adicionais..."></textarea>
+          </div>
 
-        <button type="submit" class="btn-primary">Salvar contato</button>
-      </form>
+          <button type="submit" class="btn-primary">👤 Salvar contato</button>
+        </form>
+      </div>
     </section>
 
-    <!-- ========================================
-         SEÇÃO 6: CADASTRAR ALERTAS
-         ======================================== -->
+    <!-- SEÇÃO 6: CADASTRAR ALERTAS -->
     <section class="admin-section">
-      <h2>Cadastrar Alertas da Viagem</h2>
-      <form id="form-alertas">
-        <div class="# 🎯 ADMIN.HTML COMPLETO — CORRIGIDO E ORGANIZADO
+      <div class="section-header" onclick="toggleSection(this)">
+        <h2><span class="section-icon">⚠️</span> Cadastrar Alertas da Viagem</h2>
+        <span class="section-toggle">▼</span>
+      </div>
+      <div class="section-content">
+        <form id="form-alertas">
+          <div class="form-group">
+            <label for="alertas-viagem">Selecione a viagem *</label>
+            <select id="alertas-viagem" name="viagem_id" required>
+              <option value="">Carregando...</option>
+            </select>
+          </div>
 
-Copie **TODO** este código e substitua **completamente** o arquivo `public/admin.html`:
+          <div class="form-row">
+            <div class="form-group">
+              <label for="alerta-tipo">Tipo de alerta *</label>
+              <select id="alerta-tipo" name="tipo" required>
+                <option value="Clima">Clima</option>
+                <option value="Documentação">Documentação</option>
+                <option value="Saúde">Saúde</option>
+                <option value="Segurança">Segurança</option>
+                <option value="Moeda">Moeda</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </div>
 
+            <div class="form-group">
+              <label for="alerta-prioridade">Prioridade *</label>
+              <select id="alerta-prioridade" name="prioridade" required>
+                <option value="baixa">Baixa</option>
+                <option value="normal" selected>Normal</option>
+                <option value="alta">Alta</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="alerta-titulo">Título *</label>
+            <input type="text" id="alerta-titulo" name="titulo" required placeholder="Ex: Clima em Março">
+          </div>
+
+          <div class="form-group">
+            <label for="alerta-mensagem">Mensagem *</label>
+            <textarea id="alerta-mensagem" name="mensagem" rows="4" required placeholder="Descreva o alerta..."></textarea>
+          </div>
+
+          <button type="submit" class="btn-primary">🔔 Salvar alerta</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2025 ObomGuru</p>
+  </footer>
+
+  <!-- JAVASCRIPT -->
+  <script>
+    // Toggle de seções colapsáveis
+    function toggleSection(header) {
+      const content = header.nextElementSibling;
+      const toggle = header.querySelector('.section-toggle');
+
+      content.classList.toggle('active');
+      toggle.style.transform = content.classList.contains('active') 
+        ? 'rotate(180deg)' 
+        : 'rotate(0deg)';
+    }
+
+    // Abrir a primeira seção por padrão
+    document.addEventListener('DOMContentLoaded', () => {
+      const firstSection = document.querySelector('.section-header');
+      if (firstSection) toggleSection(firstSection);
+    });
+  </script>
+  <script type="module" src="js/admin.js"></script>
+
+</body>
+</html>
