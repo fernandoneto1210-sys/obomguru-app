@@ -15,7 +15,7 @@ async function carregarViagem() {
   }
 
   try {
-    // Buscar viagem com destino relacionado
+    // Buscar viagem com destino relacionado (apenas colunas que EXISTEM)
     console.log('🔄 Buscando viagem no Supabase...');
 
     const { data: viagem, error: viagemError } = await supabase
@@ -23,12 +23,9 @@ async function carregarViagem() {
       .select(`
         *,
         destinos (
+          id,
           nome,
-          pais,
-          moeda,
-          simbolo_moeda,
-          dicas_gerais,
-          imagem_capa_url
+          pais
         )
       `)
       .eq('id', viagemId)
@@ -66,7 +63,6 @@ async function carregarViagem() {
     await carregarAlertas(viagemId);
 
     console.log('✅ Página carregada com sucesso!');
-
   } catch (error) {
     console.error('💥 Erro geral:', error);
     mostrarErro('Erro ao carregar viagem: ' + error.message);
@@ -95,48 +91,45 @@ function exibirViagem(viagem) {
     console.log('✅ Destino definido:', destino.nome);
   }
 
-  // Datas (CORRIGIDO PARA EVITAR PROBLEMA DE TIMEZONE)
+  // Datas (sem timezone, formatando manualmente)
   const datasEl = document.getElementById('viagem-datas');
   if (datasEl) {
     const saida = viagem.data_saida
-      ? formatarData(viagem.data_saida)
+      ? formatarDataISO(viagem.data_saida)
       : 'Não definida';
     const retorno = viagem.data_retorno
-      ? formatarData(viagem.data_retorno)
+      ? formatarDataISO(viagem.data_retorno)
       : 'Não definida';
     datasEl.textContent = `${saida} → ${retorno}`;
     console.log('✅ Datas definidas:', saida, '→', retorno);
   }
 
-  // Moeda
+  // Moeda (por enquanto você não tem moeda na tabela destinos,
+  // então vamos só deixar um traço ou texto fixo)
   const moedaEl = document.getElementById('viagem-moeda');
-  if (moedaEl && destino) {
-    moedaEl.textContent = `${destino.simbolo_moeda} ${destino.moeda}`;
-    console.log('✅ Moeda definida:', destino.moeda);
+  if (moedaEl) {
+    moedaEl.textContent = '—';
   }
 
-  // Dicas do destino
+  // Dicas do destino (também ainda não existe coluna no banco)
   const dicasEl = document.getElementById('viagem-dicas');
-  if (dicasEl && destino && destino.dicas_gerais) {
-    dicasEl.textContent = destino.dicas_gerais;
-    console.log('✅ Dicas definidas');
+  if (dicasEl) {
+    dicasEl.textContent = 'Em breve adicionaremos dicas detalhadas deste destino.';
   }
 
-  // Imagem de capa
+  // Imagem de capa (também ainda não existe no banco)
   const imagemEl = document.getElementById('viagem-imagem');
-  if (imagemEl && destino && destino.imagem_capa_url) {
-    imagemEl.src = destino.imagem_capa_url;
-    imagemEl.alt = destino.nome;
-    imagemEl.style.display = 'block';
-    console.log('✅ Imagem definida:', destino.imagem_capa_url);
+  if (imagemEl) {
+    imagemEl.style.display = 'none'; // por enquanto esconde
   }
 }
 
 // ========================================
-// FORMATAR DATA (CORRIGIDO)
+// FORMATAR DATA ISO (YYYY-MM-DD → DD/MM/YYYY)
 // ========================================
-function formatarData(dataISO) {
+function formatarDataISO(dataISO) {
   // dataISO vem como "2025-03-15"
+  if (!dataISO) return '';
   const [ano, mes, dia] = dataISO.split('-');
   return `${dia}/${mes}/${ano}`;
 }
@@ -206,7 +199,7 @@ async function carregarDocumentos(viagemId) {
     docEl.innerHTML = `
       <h4>${doc.tipo}: ${doc.nome}</h4>
       ${doc.link ? `<p><a href="${doc.link}" target="_blank">Acessar documento</a></p>` : ''}
-      ${doc.observacoes ? `<p>${doc.observacoes}</p>` : ''}
+      ${doc.observ ? `<p>${doc.observacoes}</p>` : ''}
     `;
     container.appendChild(docEl);
   });
