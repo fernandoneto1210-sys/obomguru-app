@@ -7,6 +7,8 @@ async function carregarViagem() {
   const urlParams = new URLSearchParams(window.location.search);
   const viagemId = urlParams.get('id');
 
+  console.log('🔍 ID da URL:', viagemId);
+
   if (!viagemId) {
     mostrarErro('ID da viagem não fornecido.');
     return;
@@ -14,6 +16,8 @@ async function carregarViagem() {
 
   try {
     // Buscar viagem com destino relacionado
+    console.log('🔄 Buscando viagem no Supabase...');
+
     const { data: viagem, error: viagemError } = await supabase
       .from('viagens')
       .select(`
@@ -30,11 +34,21 @@ async function carregarViagem() {
       .eq('id', viagemId)
       .single();
 
-    if (viagemError || !viagem) {
-      console.error('Erro ao buscar viagem:', viagemError);
+    console.log('📦 Resposta do Supabase:', { viagem, viagemError });
+
+    if (viagemError) {
+      console.error('❌ Erro do Supabase:', viagemError);
+      mostrarErro('Erro ao buscar viagem: ' + viagemError.message);
+      return;
+    }
+
+    if (!viagem) {
+      console.error('❌ Viagem não encontrada');
       mostrarErro('Viagem não encontrada.');
       return;
     }
+
+    console.log('✅ Viagem encontrada:', viagem);
 
     // Exibir informações da viagem
     exibirViagem(viagem);
@@ -51,9 +65,11 @@ async function carregarViagem() {
     // Buscar alertas
     await carregarAlertas(viagemId);
 
+    console.log('✅ Página carregada com sucesso!');
+
   } catch (error) {
-    console.error('Erro geral:', error);
-    mostrarErro('Erro ao carregar viagem.');
+    console.error('💥 Erro geral:', error);
+    mostrarErro('Erro ao carregar viagem: ' + error.message);
   }
 }
 
@@ -61,40 +77,49 @@ async function carregarViagem() {
 // EXIBIR INFORMAÇÕES DA VIAGEM
 // ========================================
 function exibirViagem(viagem) {
+  console.log('🎨 Exibindo informações da viagem...');
+
   const destino = viagem.destinos;
 
   // Nome da viagem
   const tituloEl = document.getElementById('viagem-titulo');
-  if (tituloEl) tituloEl.textContent = viagem.nome_viagem;
+  if (tituloEl) {
+    tituloEl.textContent = viagem.nome_viagem;
+    console.log('✅ Título definido:', viagem.nome_viagem);
+  }
 
   // Destino
   const destinoEl = document.getElementById('viagem-destino');
   if (destinoEl && destino) {
     destinoEl.textContent = `${destino.nome} - ${destino.pais}`;
+    console.log('✅ Destino definido:', destino.nome);
   }
 
-  // Datas
+  // Datas (CORRIGIDO PARA EVITAR PROBLEMA DE TIMEZONE)
   const datasEl = document.getElementById('viagem-datas');
   if (datasEl) {
     const saida = viagem.data_saida
-      ? new Date(viagem.data_saida).toLocaleDateString('pt-BR')
+      ? formatarData(viagem.data_saida)
       : 'Não definida';
     const retorno = viagem.data_retorno
-      ? new Date(viagem.data_retorno).toLocaleDateString('pt-BR')
+      ? formatarData(viagem.data_retorno)
       : 'Não definida';
     datasEl.textContent = `${saida} → ${retorno}`;
+    console.log('✅ Datas definidas:', saida, '→', retorno);
   }
 
   // Moeda
   const moedaEl = document.getElementById('viagem-moeda');
   if (moedaEl && destino) {
     moedaEl.textContent = `${destino.simbolo_moeda} ${destino.moeda}`;
+    console.log('✅ Moeda definida:', destino.moeda);
   }
 
   // Dicas do destino
   const dicasEl = document.getElementById('viagem-dicas');
   if (dicasEl && destino && destino.dicas_gerais) {
     dicasEl.textContent = destino.dicas_gerais;
+    console.log('✅ Dicas definidas');
   }
 
   // Imagem de capa
@@ -102,13 +127,26 @@ function exibirViagem(viagem) {
   if (imagemEl && destino && destino.imagem_capa_url) {
     imagemEl.src = destino.imagem_capa_url;
     imagemEl.alt = destino.nome;
+    imagemEl.style.display = 'block';
+    console.log('✅ Imagem definida:', destino.imagem_capa_url);
   }
+}
+
+// ========================================
+// FORMATAR DATA (CORRIGIDO)
+// ========================================
+function formatarData(dataISO) {
+  // dataISO vem como "2025-03-15"
+  const [ano, mes, dia] = dataISO.split('-');
+  return `${dia}/${mes}/${ano}`;
 }
 
 // ========================================
 // CARREGAR ROTEIRO
 // ========================================
 async function carregarRoteiro(viagemId) {
+  console.log('📅 Carregando roteiro...');
+
   const { data, error } = await supabase
     .from('roteiro_dias')
     .select('*')
@@ -120,8 +158,11 @@ async function carregarRoteiro(viagemId) {
 
   if (error || !data || data.length === 0) {
     container.innerHTML = '<p>Nenhum roteiro cadastrado ainda.</p>';
+    console.log('ℹ️ Nenhum roteiro encontrado');
     return;
   }
+
+  console.log('✅ Roteiro encontrado:', data.length, 'dias');
 
   container.innerHTML = '';
   data.forEach(dia => {
@@ -139,6 +180,8 @@ async function carregarRoteiro(viagemId) {
 // CARREGAR DOCUMENTOS
 // ========================================
 async function carregarDocumentos(viagemId) {
+  console.log('📄 Carregando documentos...');
+
   const { data, error } = await supabase
     .from('documentos')
     .select('*')
@@ -150,8 +193,11 @@ async function carregarDocumentos(viagemId) {
 
   if (error || !data || data.length === 0) {
     container.innerHTML = '<p>Nenhum documento cadastrado ainda.</p>';
+    console.log('ℹ️ Nenhum documento encontrado');
     return;
   }
+
+  console.log('✅ Documentos encontrados:', data.length);
 
   container.innerHTML = '';
   data.forEach(doc => {
@@ -170,6 +216,8 @@ async function carregarDocumentos(viagemId) {
 // CARREGAR CONTATOS
 // ========================================
 async function carregarContatos(viagemId) {
+  console.log('📞 Carregando contatos...');
+
   const { data, error } = await supabase
     .from('contatos')
     .select('*')
@@ -181,8 +229,11 @@ async function carregarContatos(viagemId) {
 
   if (error || !data || data.length === 0) {
     container.innerHTML = '<p>Nenhum contato cadastrado ainda.</p>';
+    console.log('ℹ️ Nenhum contato encontrado');
     return;
   }
+
+  console.log('✅ Contatos encontrados:', data.length);
 
   container.innerHTML = '';
   data.forEach(contato => {
@@ -202,6 +253,8 @@ async function carregarContatos(viagemId) {
 // CARREGAR ALERTAS
 // ========================================
 async function carregarAlertas(viagemId) {
+  console.log('⚠️ Carregando alertas...');
+
   const { data, error } = await supabase
     .from('alertas')
     .select('*')
@@ -213,8 +266,11 @@ async function carregarAlertas(viagemId) {
 
   if (error || !data || data.length === 0) {
     container.innerHTML = '<p>Nenhum alerta cadastrado ainda.</p>';
+    console.log('ℹ️ Nenhum alerta encontrado');
     return;
   }
+
+  console.log('✅ Alertas encontrados:', data.length);
 
   container.innerHTML = '';
   data.forEach(alerta => {
@@ -232,6 +288,7 @@ async function carregarAlertas(viagemId) {
 // MOSTRAR ERRO
 // ========================================
 function mostrarErro(mensagem) {
+  console.error('❌ Mostrando erro:', mensagem);
   document.body.innerHTML = `
     <div style="text-align: center; padding: 50px;">
       <h1>${mensagem}</h1>
@@ -243,4 +300,5 @@ function mostrarErro(mensagem) {
 // ========================================
 // INICIALIZAR
 // ========================================
+console.log('🚀 Iniciando carregamento da página...');
 document.addEventListener('DOMContentLoaded', carregarViagem);
