@@ -15,7 +15,7 @@ async function carregarViagem() {
   }
 
   try {
-    // Buscar viagem com destino relacionado (apenas colunas que EXISTEM)
+    // Buscar viagem com destino relacionado (AGORA COM TODOS OS CAMPOS)
     console.log('🔄 Buscando viagem no Supabase...');
 
     const { data: viagem, error: viagemError } = await supabase
@@ -25,7 +25,11 @@ async function carregarViagem() {
         destinos (
           id,
           nome,
-          pais
+          pais,
+          moeda,
+          simbolo_moeda,
+          dicas_gerais,
+          imagem_capa_url
         )
       `)
       .eq('id', viagemId)
@@ -91,7 +95,7 @@ function exibirViagem(viagem) {
     console.log('✅ Destino definido:', destino.nome);
   }
 
-  // Datas (sem timezone, formatando manualmente)
+  // Datas
   const datasEl = document.getElementById('viagem-datas');
   if (datasEl) {
     const saida = viagem.data_saida
@@ -104,23 +108,37 @@ function exibirViagem(viagem) {
     console.log('✅ Datas definidas:', saida, '→', retorno);
   }
 
-  // Moeda (por enquanto você não tem moeda na tabela destinos,
-  // então vamos só deixar um traço ou texto fixo)
+  // Moeda (AGORA COM OS NOVOS CAMPOS)
   const moedaEl = document.getElementById('viagem-moeda');
-  if (moedaEl) {
-    moedaEl.textContent = '—';
+  if (moedaEl && destino) {
+    if (destino.simbolo_moeda && destino.moeda) {
+      moedaEl.textContent = `${destino.simbolo_moeda} ${destino.moeda}`;
+      console.log('✅ Moeda definida:', destino.moeda);
+    } else {
+      moedaEl.textContent = '—';
+    }
   }
 
-  // Dicas do destino (também ainda não existe coluna no banco)
+  // Dicas do destino (AGORA COM OS NOVOS CAMPOS)
   const dicasEl = document.getElementById('viagem-dicas');
-  if (dicasEl) {
-    dicasEl.textContent = 'Em breve adicionaremos dicas detalhadas deste destino.';
+  if (dicasEl && destino) {
+    if (destino.dicas_gerais) {
+      dicasEl.textContent = destino.dicas_gerais;
+      console.log('✅ Dicas definidas');
+    } else {
+      dicasEl.textContent = 'Em breve adicionaremos dicas detalhadas deste destino.';
+    }
   }
 
-  // Imagem de capa (também ainda não existe no banco)
+  // Imagem de capa (AGORA COM OS NOVOS CAMPOS)
   const imagemEl = document.getElementById('viagem-imagem');
-  if (imagemEl) {
-    imagemEl.style.display = 'none'; // por enquanto esconde
+  if (imagemEl && destino && destino.imagem_capa_url) {
+    imagemEl.src = destino.imagem_capa_url;
+    imagemEl.alt = destino.nome;
+    imagemEl.style.display = 'block';
+    console.log('✅ Imagem definida');
+  } else if (imagemEl) {
+    imagemEl.style.display = 'none';
   }
 }
 
@@ -128,8 +146,7 @@ function exibirViagem(viagem) {
 // FORMATAR DATA ISO (YYYY-MM-DD → DD/MM/YYYY)
 // ========================================
 function formatarDataISO(dataISO) {
-  // dataISO vem como "2025-03-15"
-  if (!dataISO) return '';
+  if (!dataISO) return 'Não definida';
   const [ano, mes, dia] = dataISO.split('-');
   return `${dia}/${mes}/${ano}`;
 }
@@ -199,7 +216,7 @@ async function carregarDocumentos(viagemId) {
     docEl.innerHTML = `
       <h4>${doc.tipo}: ${doc.nome}</h4>
       ${doc.link ? `<p><a href="${doc.link}" target="_blank">Acessar documento</a></p>` : ''}
-      ${doc.observ ? `<p>${doc.observacoes}</p>` : ''}
+      ${doc.observacoes ? `<p>${doc.observacoes}</p>` : ''}
     `;
     container.appendChild(docEl);
   });
