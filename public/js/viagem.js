@@ -1,115 +1,246 @@
-import { supabase } from "./supabase.js";
+import { supabase } from './supabase.js';
 
+// ========================================
+// BUSCAR VIAGEM E EXIBIR NA PÁGINA
+// ========================================
 async function carregarViagem() {
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get('id');
+  const urlParams = new URLSearchParams(window.location.search);
+  const viagemId = urlParams.get('id');
 
-  if (!id) {
-    document.body.innerHTML = '<p style="text-align:center;padding:2rem;">Viagem não encontrada.</p>';
+  if (!viagemId) {
+    mostrarErro('ID da viagem não fornecido.');
     return;
   }
 
   try {
-    const { data: viagem, error } = await supabase
+    // Buscar viagem com destino relacionado
+    const { data: viagem, error: viagemError } = await supabase
       .from('viagens')
       .select(`
         *,
-        destinos (*),
-        dias_roteiro (*),
-        documentos (*),
-        contatos (*),
-        alertas (*)
+        destinos (
+          nome,
+          pais,
+          moeda,
+          simbolo_moeda,
+          dicas_gerais,
+          imagem_capa_url
+        )
       `)
-      .eq('id', id)
+      .eq('id', viagemId)
       .single();
 
-    if (error || !viagem) {
-      document.body.innerHTML = '<p style="text-align:center;padding:2rem;">Viagem não encontrada.</p>';
+    if (viagemError || !viagem) {
+      console.error('Erro ao buscar viagem:', viagemError);
+      mostrarErro('Viagem não encontrada.');
       return;
     }
 
-    // Título
-    document.getElementById('tituloViagem').textContent = viagem.nome_viagem;
+    // Exibir informações da viagem
+    exibirViagem(viagem);
 
-    // Informações básicas
-    const infoBasica = document.getElementById('infoBasica');
-    infoBasica.innerHTML = `
-      <h3>${viagem.destinos.nome} - ${viagem.destinos.pais}</h3>
-      <p><strong>Saída:</strong> ${new Date(viagem.data_saida).toLocaleDateString('pt-BR')}</p>
-      <p><strong>Retorno:</strong> ${new Date(viagem.data_retorno).toLocaleDateString('pt-BR')}</p>
-      <p><strong>Moeda:</strong> ${viagem.destinos.simbolo_moeda} ${viagem.destinos.moeda}</p>
-      ${viagem.destinos.dicas ? `<p><strong>Dicas:</strong> ${viagem.destinos.dicas}</p>` : ''}
-    `;
+    // Buscar roteiro
+    await carregarRoteiro(viagemId);
 
-    // Roteiro
-    const roteiroDiv = document.getElementById('roteiro');
-    if (viagem.dias_roteiro && viagem.dias_roteiro.length > 0) {
-      viagem.dias_roteiro.sort((a, b) => a.dia - b.dia).forEach(dia => {
-        const bloco = document.createElement('div');
-        bloco.className = 'dia';
-        bloco.innerHTML = `
-          <h3>Dia ${dia.dia}${dia.titulo ? ': ' + dia.titulo : ''}</h3>
-          ${dia.descricao ? `<p>${dia.descricao}</p>` : ''}
-          ${dia.atividades ? `<ul>${dia.atividades.map(a => `<li>${a.horario || ''} – ${a.descricao || ''}</li>`).join('')}</ul>` : ''}
-          ${dia.imagens ? dia.imagens.map(i => `<img src="${i.url}" alt="${i.legenda || ''}" class="resp-img">`).join('') : ''}
-        `;
-        roteiroDiv.appendChild(bloco);
-      });
-    } else {
-      roteiroDiv.innerHTML = '<p>Roteiro ainda não cadastrado.</p>';
-    }
+    // Buscar documentos
+    await carregarDocumentos(viagemId);
 
-    // Documentos
-    const docsDiv = document.getElementById('documentos');
-    if (viagem.documentos && viagem.documentos.length > 0) {
-      viagem.documentos.forEach(doc => {
-        const a = document.createElement('a');
-        a.href = doc.url;
-        a.textContent = doc.nome;
-        a.target = '_blank';
-        a.style.display = 'block';
-        a.style.marginBottom = '0.5rem';
-        docsDiv.appendChild(a);
-      });
-    } else {
-      docsDiv.innerHTML = '<p>Nenhum documento anexado.</p>';
-    }
+    // Buscar contatos
+    await carregarContatos(viagemId);
 
-    // Contatos
-    const contatosDiv = document.getElementById('contatos');
-    if (viagem.contatos && viagem.contatos.length > 0) {
-      viagem.contatos.forEach(c => {
-        const p = document.createElement('p');
-        p.innerHTML = `<strong>${c.tipo}:</strong> ${c.nome} - ${c.telefone || ''} ${c.email || ''}`;
-        contatosDiv.appendChild(p);
-      });
-    } else {
-      contatosDiv.innerHTML = '<p>Nenhum contato cadastrado.</p>';
-    }
+    // Buscar alertas
+    await carregarAlertas(viagemId);
 
-    // Alertas
-    const alertasDiv = document.getElementById('alertas');
-    if (viagem.alertas && viagem.alertas.length > 0) {
-      viagem.alertas.forEach(a => {
-        const p = document.createElement('p');
-        p.textContent = `${new Date(a.data_hora).toLocaleString('pt-BR')}: ${a.mensagem}`;
-        alertasDiv.appendChild(p);
-      });
-    } else {
-      alertasDiv.innerHTML = '<p>Nenhum alerta cadastrado.</p>';
-    }
-
-    // Botão PDF (simples - usando window.print por enquanto)
-    document.getElementById('btnPdf').addEventListener('click', () => {
-      window.print();
-    });
-
-  } catch (erro) {
-    console.error('Erro ao carregar viagem:', erro);
-    document.body.innerHTML = '<p style="text-align:center;padding:2rem;">Erro ao carregar viagem.</p>';
+  } catch (error) {
+    console.error('Erro geral:', error);
+    mostrarErro('Erro ao carregar viagem.');
   }
 }
 
-carregarViagem();
+// ========================================
+// EXIBIR INFORMAÇÕES DA VIAGEM
+// ========================================
+function exibirViagem(viagem) {
+  const destino = viagem.destinos;
 
+  // Nome da viagem
+  const tituloEl = document.getElementById('viagem-titulo');
+  if (tituloEl) tituloEl.textContent = viagem.nome_viagem;
 
+  // Destino
+  const destinoEl = document.getElementById('viagem-destino');
+  if (destinoEl && destino) {
+    destinoEl.textContent = `${destino.nome} - ${destino.pais}`;
+  }
+
+  // Datas
+  const datasEl = document.getElementById('viagem-datas');
+  if (datasEl) {
+    const saida = viagem.data_saida
+      ? new Date(viagem.data_saida).toLocaleDateString('pt-BR')
+      : 'Não definida';
+    const retorno = viagem.data_retorno
+      ? new Date(viagem.data_retorno).toLocaleDateString('pt-BR')
+      : 'Não definida';
+    datasEl.textContent = `${saida} → ${retorno}`;
+  }
+
+  // Moeda
+  const moedaEl = document.getElementById('viagem-moeda');
+  if (moedaEl && destino) {
+    moedaEl.textContent = `${destino.simbolo_moeda} ${destino.moeda}`;
+  }
+
+  // Dicas do destino
+  const dicasEl = document.getElementById('viagem-dicas');
+  if (dicasEl && destino && destino.dicas_gerais) {
+    dicasEl.textContent = destino.dicas_gerais;
+  }
+
+  // Imagem de capa
+  const imagemEl = document.getElementById('viagem-imagem');
+  if (imagemEl && destino && destino.imagem_capa_url) {
+    imagemEl.src = destino.imagem_capa_url;
+    imagemEl.alt = destino.nome;
+  }
+}
+
+// ========================================
+// CARREGAR ROTEIRO
+// ========================================
+async function carregarRoteiro(viagemId) {
+  const { data, error } = await supabase
+    .from('roteiro_dias')
+    .select('*')
+    .eq('viagem_id', viagemId)
+    .order('dia');
+
+  const container = document.getElementById('roteiro-lista');
+  if (!container) return;
+
+  if (error || !data || data.length === 0) {
+    container.innerHTML = '<p>Nenhum roteiro cadastrado ainda.</p>';
+    return;
+  }
+
+  container.innerHTML = '';
+  data.forEach(dia => {
+    const diaEl = document.createElement('div');
+    diaEl.className = 'roteiro-dia';
+    diaEl.innerHTML = `
+      <h3>Dia ${dia.dia}: ${dia.titulo}</h3>
+      <p>${dia.descricao}</p>
+    `;
+    container.appendChild(diaEl);
+  });
+}
+
+// ========================================
+// CARREGAR DOCUMENTOS
+// ========================================
+async function carregarDocumentos(viagemId) {
+  const { data, error } = await supabase
+    .from('documentos')
+    .select('*')
+    .eq('viagem_id', viagemId)
+    .order('created_at');
+
+  const container = document.getElementById('documentos-lista');
+  if (!container) return;
+
+  if (error || !data || data.length === 0) {
+    container.innerHTML = '<p>Nenhum documento cadastrado ainda.</p>';
+    return;
+  }
+
+  container.innerHTML = '';
+  data.forEach(doc => {
+    const docEl = document.createElement('div');
+    docEl.className = 'documento-item';
+    docEl.innerHTML = `
+      <h4>${doc.tipo}: ${doc.nome}</h4>
+      ${doc.link ? `<p><a href="${doc.link}" target="_blank">Acessar documento</a></p>` : ''}
+      ${doc.observacoes ? `<p>${doc.observacoes}</p>` : ''}
+    `;
+    container.appendChild(docEl);
+  });
+}
+
+// ========================================
+// CARREGAR CONTATOS
+// ========================================
+async function carregarContatos(viagemId) {
+  const { data, error } = await supabase
+    .from('contatos')
+    .select('*')
+    .eq('viagem_id', viagemId)
+    .order('created_at');
+
+  const container = document.getElementById('contatos-lista');
+  if (!container) return;
+
+  if (error || !data || data.length === 0) {
+    container.innerHTML = '<p>Nenhum contato cadastrado ainda.</p>';
+    return;
+  }
+
+  container.innerHTML = '';
+  data.forEach(contato => {
+    const contatoEl = document.createElement('div');
+    contatoEl.className = 'contato-item';
+    contatoEl.innerHTML = `
+      <h4>${contato.tipo}: ${contato.nome}</h4>
+      ${contato.telefone ? `<p>📞 ${contato.telefone}</p>` : ''}
+      ${contato.email ? `<p>📧 ${contato.email}</p>` : ''}
+      ${contato.observacoes ? `<p>${contato.observacoes}</p>` : ''}
+    `;
+    container.appendChild(contatoEl);
+  });
+}
+
+// ========================================
+// CARREGAR ALERTAS
+// ========================================
+async function carregarAlertas(viagemId) {
+  const { data, error } = await supabase
+    .from('alertas')
+    .select('*')
+    .eq('viagem_id', viagemId)
+    .order('prioridade', { ascending: false });
+
+  const container = document.getElementById('alertas-lista');
+  if (!container) return;
+
+  if (error || !data || data.length === 0) {
+    container.innerHTML = '<p>Nenhum alerta cadastrado ainda.</p>';
+    return;
+  }
+
+  container.innerHTML = '';
+  data.forEach(alerta => {
+    const alertaEl = document.createElement('div');
+    alertaEl.className = `alerta-item alerta-${alerta.prioridade}`;
+    alertaEl.innerHTML = `
+      <h4>${alerta.tipo}: ${alerta.titulo}</h4>
+      <p>${alerta.mensagem}</p>
+    `;
+    container.appendChild(alertaEl);
+  });
+}
+
+// ========================================
+// MOSTRAR ERRO
+// ========================================
+function mostrarErro(mensagem) {
+  document.body.innerHTML = `
+    <div style="text-align: center; padding: 50px;">
+      <h1>${mensagem}</h1>
+      <a href="index.html">Voltar para a página inicial</a>
+    </div>
+  `;
+}
+
+// ========================================
+// INICIALIZAR
+// ========================================
+document.addEventListener('DOMContentLoaded', carregarViagem);
