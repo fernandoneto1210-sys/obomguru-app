@@ -244,30 +244,54 @@
     <div id="feedback" class="feedback-message"></div>
 
     <!-- SEÇÃO 1: CADASTRAR DESTINO -->
-    <section class="admin-section">
-      <div class="section-header" onclick="toggleSection(this)">
-        <h2><span class="section-icon">🌍</span> Cadastrar Novo Destino</h2>
-        <span class="section-toggle">▼</span>
+<section class="admin-section">
+  <div class="section-header" onclick="toggleSection(this)">
+    <h2><span class="section-icon">🌍</span> Cadastrar Novo Destino</h2>
+    <span class="section-toggle">▼</span>
+  </div>
+  <div class="section-content">
+    <form id="form-destino">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nome">Nome do destino *</label>
+          <input type="text" id="nome" name="nome" required placeholder="Ex: Buenos Aires">
+        </div>
+
+        <div class="form-group">
+          <label for="pais">País *</label>
+          <input type="text" id="pais" name="pais" required placeholder="Ex: Argentina">
+        </div>
       </div>
-      <div class="section-content">
-        <form id="form-destino">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="nome">Nome do destino *</label>
-              <input type="text" id="nome" name="nome" required placeholder="Ex: Buenos Aires">
-            </div>
 
-            <div class="form-group">
-              <label for="pais">País *</label>
-              <input type="text" id="pais" name="pais" required placeholder="Ex: Argentina">
-            </div>
-          </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="moeda">Moeda</label>
+          <input type="text" id="moeda" name="moeda" placeholder="Ex: Peso Argentino">
+        </div>
 
-          <button type="submit" class="btn-primary">💾 Salvar Destino</button>
-        </form>
+        <div class="form-group">
+          <label for="simbolo_moeda">Símbolo da moeda</label>
+          <input type="text" id="simbolo_moeda" name="simbolo_moeda" placeholder="Ex: $">
+        </div>
       </div>
-    </section>
 
+      <div class="form-group">
+        <label for="dicas_gerais">Dicas gerais do destino</label>
+        <textarea id="dicas_gerais" name="dicas_gerais" rows="4" placeholder="Dicas sobre clima, cultura, gastronomia, etc..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="imagem_capa_url">URL da imagem de capa</label>
+        <input type="url" id="imagem_capa_url" name="imagem_capa_url" placeholder="https://exemplo.com/imagem.jpg">
+        <small style="color: #666; display: block; margin-top: 5px;">
+          💡 Dica: Use imagens do Unsplash (https://unsplash.com) ou outro serviço gratuito
+        </small>
+      </div>
+
+      <button type="submit" class="btn-primary">💾 Salvar Destino</button>
+    </form>
+  </div>
+</section>
     <!-- SEÇÃO 2: CADASTRAR VIAGEM -->
     <section class="admin-section">
       <div class="section-header" onclick="toggleSection(this)">
@@ -529,3 +553,4 @@
 
 </body>
 </html>
+
