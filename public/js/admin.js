@@ -56,10 +56,10 @@ async function carregarViagensNosSelects() {
     data.forEach(viagem => {
       const opt = document.createElement('option');
       const saida = viagem.data_saida
-        ? new Date(viagem.data_saida).toLocaleDateString('pt-BR')
+        ? new Date(viagem.data_saida + 'T00:00:00').toLocaleDateString('pt-BR')
         : '';
       const retorno = viagem.data_retorno
-        ? new Date(viagem.data_retorno).toLocaleDateString('pt-BR')
+        ? new Date(viagem.data_retorno + 'T00:00:00').toLocaleDateString('pt-BR')
         : '';
       opt.value = viagem.id;
       opt.textContent = `${viagem.nome_viagem} (${saida} → ${retorno})`;
@@ -98,17 +98,21 @@ async function salvarDestino(event) {
 }
 
 // ========================================
-// SALVAR VIAGEM
+// SALVAR VIAGEM (CORRIGIDO PARA ISO)
 // ========================================
 async function salvarViagem(event) {
   event.preventDefault();
   const form = event.target;
 
+  // Garantir que as datas estejam no formato ISO (YYYY-MM-DD)
+  const dataSaida = form.data_saida.value; // já vem no formato correto do input type="date"
+  const dataRetorno = form.data_retorno.value;
+
   const payload = {
     destino_id: form.destino.value,
     nome_viagem: form.nome_viagem.value.trim(),
-    data_saida: form.data_saida.value || null,
-    data_retorno: form.data_retorno.value || null
+    data_saida: dataSaida || null,
+    data_retorno: dataRetorno || null
   };
 
   const { data, error } = await supabase
