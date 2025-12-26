@@ -140,6 +140,52 @@ function exibirViagem(viagem) {
   } else if (imagemEl) {
     imagemEl.style.display = 'none';
   }
+    // ========================================
+  // LINKS ÚTEIS (AUTOMÁTICOS)
+  // ========================================
+  const linksContainer = document.getElementById('links-uteis');
+  if (linksContainer && destino) {
+    const destinoNome = encodeURIComponent(destino.nome);
+    const destinoPais = encodeURIComponent(destino.pais);
+    const moeda = destino.moeda || 'moeda local';
+
+    // Montar os links
+    const linkMaps = `https://www.google.com/maps/search/?api=1&query=${destinoNome}+${destinoPais}`;
+    const linkConversor = `https://www.google.com/search?q=1+BRL+em+${encodeURIComponent(moeda)}`;
+    const linkOQueFazer = `https://www.google.com/search?q=o+que+fazer+em+${destinoNome}`;
+    const linkClima = `https://www.google.com/search?q=clima+em+${destinoNome}+${destinoPais}`;
+
+    linksContainer.innerHTML = `
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 20px;">
+        <a href="${linkMaps}" target="_blank" class="link-util">
+          <span style="font-size: 1.5rem;">🗺️</span>
+          <strong>Ver no Mapa</strong>
+          <small>Google Maps</small>
+        </a>
+
+        <a href="${linkConversor}" target="_blank" class="link-util">
+          <span style="font-size: 1.5rem;">💱</span>
+          <strong>Conversor de Moeda</strong>
+          <small>BRL → ${moeda}</small>
+        </a>
+
+        <a href="${linkOQueFazer}" target="_blank" class="link-util">
+          <span style="font-size: 1.5rem;">🎯</span>
+          <strong>O que fazer</strong>
+          <small>Atrações e dicas</small>
+        </a>
+
+        <a href="${linkClima}" target="_blank" class="link-util">
+          <span style="font-size: 1.5rem;">🌡️</span>
+          <strong>Clima e Previsão</strong>
+          <small>Temperatura atual</small>
+        </a>
+      </div>
+    `;
+
+    console.log('✅ Links úteis criados');
+  }
+
 }
 
 // ========================================
@@ -312,3 +358,4 @@ function mostrarErro(mensagem) {
 // ========================================
 console.log('🚀 Iniciando carregamento da página...');
 document.addEventListener('DOMContentLoaded', carregarViagem);
+
