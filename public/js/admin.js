@@ -43,7 +43,8 @@ async function carregarViagensNosSelects() {
   const { data, error } = await supabase
     .from('viagens')
     .select('id, nome_viagem, data_saida, data_retorno')
-    .order('created_at', { ascending: false });
+    .order('nome_viagem', { ascending: true });
+
 
   if (error) {
     console.error('Erro ao carregar viagens:', error);
@@ -266,3 +267,4 @@ document.addEventListener('DOMContentLoaded', async () => {
   const formAlertas = document.getElementById('form-alertas');
   if (formAlertas) formAlertas.addEventListener('submit', salvarAlerta);
 });
+
