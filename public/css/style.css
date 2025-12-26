@@ -470,6 +470,43 @@ body {
     font-size: 1.3rem;
   }
 }
+/* ========================================
+   LINKS ÚTEIS
+   ======================================== */
+
+.link-util {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #333;
+  transition: all 0.3s ease;
+  text-align: center;
+  gap: 8px;
+}
+
+.link-util:hover {
+  border-color: #2d5016;
+  box-shadow: 0 4px 12px rgba(45, 80, 22, 0.2);
+  transform: translateY(-2px);
+}
+
+.link-util strong {
+  color: #2d5016;
+  font-size: 1rem;
+}
+
+.link-util small {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+
 
 
 
