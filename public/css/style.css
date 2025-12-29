@@ -706,5 +706,174 @@ body {
     text-align: center;
   }
 }
+/* ========================================
+   MENU HAMBURGER (MOBILE)
+   ======================================== */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background: #2d5016;
+  position: relative;
+}
+
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 10px;
+  z-index: 1001;
+}
+
+.nav {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+
+.nav a:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .hamburger {
+    display: block;
+  }
+
+  .nav {
+    position: fixed;
+    top: 70px;
+    right: -300px;
+    width: 200px;
+    background: #2d5016;
+    flex-direction: column;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: right 0.3s ease;
+    z-index: 1000;
+  }
+
+  .nav.active {
+    right: 20px;
+  }
+
+  .nav a {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 15px;
+  }
+}
+
+/* ========================================
+   CARDS DE VIAGENS
+   ======================================== */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.viagem-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.viagem-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(45, 80, 22, 0.2);
+}
+
+.viagem-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  background: #eaeaea;
+}
+
+.card-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.viagem-card h3 {
+  margin: 0;
+  color: #2d5016;
+  font-size: 1.3rem;
+  line-height: 1.3;
+}
+
+.card-destino {
+  color: #666;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.card-datas {
+  color: #999;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.btn-card {
+  display: inline-block;
+  margin-top: auto;
+  padding: 12px 24px;
+  background: #2d5016;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.btn-card:hover {
+  background: #1f3810;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .cards {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px 15px;
+  }
+
+  .viagem-card img {
+    height: 180px;
+  }
+}
+
 
 
