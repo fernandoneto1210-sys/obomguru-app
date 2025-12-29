@@ -605,14 +605,67 @@ body {
     height: 180px;
   }
 }
+/* ========================================
+   CORRIGIR IMAGEM DOS CARDS
+   ======================================== */
 
+.viagem-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
 
+.viagem-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(45, 80, 22, 0.2);
+}
 
+.viagem-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  background: #eaeaea;
+}
 
+.card-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
 
+.viagem-card h3 {
+  margin: 0;
+  color: #2d5016;
+  font-size: 1.3rem;
+  line# 🎯 PERFEITO, FERNANDO! VAMOS CORRIGIR OS 2 PROBLEMAS AGORA
 
+Pelos prints você mostrou:
 
+1. ❌ **A imagem não aparece** (só mostra o texto alternativo "África do Sul – Johannesburg...")
+2. ❌ **O menu hamburger (☰) não abre** quando clica nos 3 pontinhos
 
+Vou resolver os DOIS problemas agora, um de cada vez.
 
+---
 
+# ✅ PROBLEMA 1: IMAGEM NÃO APARECE
 
+Pelo print do Supabase, eu vi que:
+
+👉 **O campo `imagem_capa_url` está VAZIO (não aparece na tabela)**
+
+Isso confirma que você **não salvou a URL da imagem** no Supabase.
+
+## SOLUÇÃO RÁPIDA:
+
+1. No Supabase, clique na linha da "África do Sul"
+2. Role até encontrar a coluna `imagem_capa_url`
+3. **Cole esta URL**:
