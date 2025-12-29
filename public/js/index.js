@@ -47,11 +47,7 @@ async function carregarViagens() {
 
     viagens.forEach((viagem) => {
       const destino = viagem.destinos;
-
-      // Imagem com fallback
       const img = destino?.imagem_capa_url || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800';
-
-      console.log('🖼️ Imagem:', img);
 
       const card = document.createElement('div');
       card.classList.add('viagem-card');
@@ -69,10 +65,10 @@ async function carregarViagens() {
       container.appendChild(card);
     });
 
-    console.log('✅ Cards criados com sucesso!');
+    console.log('✅ Cards criados!');
 
   } catch (error) {
-    console.error('💥 Erro geral:', error);
+    console.error('💥 Erro:', error);
     container.innerHTML = '<p style="text-align: center; padding: 40px;">Erro ao carregar viagens.</p>';
   }
 }
@@ -87,72 +83,51 @@ function formatar(iso) {
 }
 
 // ========================================
-// MENU HAMBURGER
+// MENU HAMBURGER (MOBILE)
 // ========================================
 function inicializarMenu() {
-  const hamburgerBtn = document.getElementById('hamburgerBtn');
-  const navMenu = document.getElementById('navMenu');
+  const hamburger = document.getElementById('hamburgerBtn');
+  const nav = document.getElementById('navMenu');
 
-  if (!hamburgerBtn || !navMenu) {
-    console.warn('⚠️ Hamburger ou Nav não encontrado');
+  console.log('🔍 Elementos do menu:', { hamburger, nav });
+
+  if (!hamburger || !nav) {
+    console.error('❌ Menu hamburger ou nav não encontrado!');
     return;
   }
 
   console.log('✅ Menu hamburger inicializado');
 
-  hamburgerBtn.addEventListener('click', (e) => {
+  // Adicionar evento de clique
+  hamburger.addEventListener('click', function(e) {
     e.preventDefault();
     e.stopPropagation();
-    navMenu.classList.toggle('active');
-    console.log('🍔 Menu toggled:', navMenu.classList.contains('active'));
+
+    nav.classList.toggle('active');
+
+    const estaAberto = nav.classList.contains('active');
+    console.log('🍔 Menu:', estaAberto ? 'ABERTO ✅' : 'FECHADO ❌');
   });
 
-  // Fechar menu ao clicar fora
-  document.addEventListener('click', (e) => {
-    if (!navMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
-      navMenu.classList.remove('active');
+  // Fechar ao clicar fora
+  document.addEventListener('click', function(e) {
+    if (!nav.contains(e.target) && !hamburger.contains(e.target)) {
+      nav.classList.remove('active');
     }
   });
 }
 
 // ========================================
-// INICIALIZAR
+// INICIALIZAR TUDO
 // ========================================
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 Página carregada');
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 DOM carregado');
+    carregarViagens();
+    inicializarMenu();
+  });
+} else {
+  console.log('🚀 DOM já estava pronto');
   carregarViagens();
   inicializarMenu();
-});
-// ======================================================
-// MENU HAMBURGER
-// ======================================================
-document.addEventListener('DOMContentLoaded', () => {
-    const hamburger = document.getElementById('hamburgerBtn');
-    const nav = document.getElementById('navMenu');
-
-    console.log("🔍 Menu encontrado?", hamburger, nav);
-
-    if (!hamburger || !nav) {
-        console.error("❌ Elementos do menu não encontrados!");
-        return;
-    }
-
-    hamburger.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        nav.classList.toggle('active');
-
-        console.log("🍔 Toggle do menu → agora está:", 
-            nav.classList.contains('active') ? "ABERTO" : "FECHADO"
-        );
-    });
-
-    // Fecha ao clicar fora
-    document.addEventListener('click', (e) => {
-        if (!nav.contains(e.target) && e.target !== hamburger) {
-            nav.classList.remove('active');
-        }
-    });
-});
-
+}
