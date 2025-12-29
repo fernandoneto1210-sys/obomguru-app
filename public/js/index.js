@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 import { supabase } from './supabase.js';
-
 // ========================================
 // CARREGAR VIAGENS
 // ========================================
@@ -159,4 +158,5 @@ if (document.readyState === 'loading') {
   carregarViagens();
   inicializarMenu();
 }
+
 
