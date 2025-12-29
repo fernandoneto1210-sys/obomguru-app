@@ -1,3 +1,31 @@
+console.log('📄 index.js carregado');
+
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('✅ DOMContentLoaded disparado');
+
+  const hamburger = document.getElementById('hamburgerBtn');
+  const nav = document.getElementById('navMenu');
+
+  console.log('🔍 hamburger:', hamburger);
+  console.log('🔍 navMenu:', nav);
+
+  if (!hamburger || !nav) {
+    console.error('❌ Não achei hamburgerBtn ou navMenu no DOM');
+    return;
+  }
+
+  hamburger.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    nav.classList.toggle('active');
+    console.log('🍔 clique no hamburger, active?', nav.classList.contains('active'));
+  });
+
+  // só para debugar: clique direto na nav
+  nav.addEventListener('click', () => {
+    console.log('📌 clique dentro do nav');
+  });
+});
 import { supabase } from './supabase.js';
 
 // ========================================
@@ -131,3 +159,4 @@ if (document.readyState === 'loading') {
   carregarViagens();
   inicializarMenu();
 }
+
