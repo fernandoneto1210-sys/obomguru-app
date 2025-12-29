@@ -1,33 +1,7 @@
 import { supabase } from "./supabase.js";
 
-// Menu hamburger
-document.getElementById('hamburgerBtn')?.addEventListener('click', () => {
-  document.getElementById('navMenu').classList.toggle('show');
-});
-
-// Carregar viagens disponíveis
-async function carregarGrupos() {
-  const container = document.getElementById('cardsContainer');
-
-  try {
-    const { data, error } = await supabase
-      .from('viagens')
-      .select(`
-        id,
-        nome_viagem,
-        data_saida,
-        data_retorno,
-        destinos (
-          nome,
-          imagem_capa
-        )
-      `)
-      .order('data_saida', { ascending: true });
-
-  import { supabase } from "./supabase.js";
-import { mostrarMensagem, salvarToken } from "./utils.js";
-
 const formLogin = document.getElementById('formLogin');
+const mensagem = document.getElementById('mensagem');
 
 formLogin?.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -35,36 +9,51 @@ formLogin?.addEventListener('submit', async (e) => {
   const email = e.target.email.value.trim();
   const senha = e.target.senha.value.trim();
 
+  console.log('🔐 Tentando login:', email);
+
   try {
-    const { data, error } = await supabase
-      .from('usuarios')
+    // Buscar na tabela CLIENTES
+    const { data: cliente, error } = await supabase
+      .from('clientes')
       .select('*')
       .eq('email', email)
       .eq('senha', senha)
-      .single();
+      .eq('ativo', true)
+      .maybeSingle();
 
-    if (error || !data) {
-      mostrarMensagem('mensagem', 'Email ou senha incorretos.', 'erro');
+    console.log('Resposta do Supabase:', { cliente, error });
+
+    if (error || !cliente) {
+      console.error('❌ Login falhou');
+      if (mensagem) {
+        mensagem.textContent = '❌ E-mail ou senha incorretos';
+        mensagem.style.color = 'red';
+      }
       return;
     }
 
-    // Salvar token (simulado - em produção use JWT real)
-    salvarToken(data.id);
+    console.log('✅ Login OK:', cliente.nome);
 
-    mostrarMensagem('mensagem', 'Login realizado com sucesso!', 'sucesso');
+    // Salvar sessão do cliente
+    localStorage.setItem('cliente_id', cliente.id);
+    localStorage.setItem('cliente_nome', cliente.nome);
+    localStorage.setItem('cliente_email', cliente.email);
 
-    // Redirecionar conforme tipo de usuário
+    if (mensagem) {
+      mensagem.textContent = '✅ Login realizado com sucesso!';
+      mensagem.style.color = 'green';
+    }
+
+    // Redirecionar para área do passageiro
     setTimeout(() => {
-      if (data.tipo === 'admin') {
-        window.location.href = 'admin.html';
-      } else {
-        window.location.href = 'index.html';
-      }
+      window.location.href = 'passageiro.html';
     }, 1000);
 
   } catch (erro) {
-    console.error('Erro no login:', erro);
-    mostrarMensagem('mensagem', 'Erro ao fazer login.', 'erro');
+    console.error('💥 Erro no login:', erro);
+    if (mensagem) {
+      mensagem.textContent = '❌ Erro ao fazer login. Tente novamente.';
+      mensagem.style.color = 'red';
+    }
   }
 });
-
