@@ -123,3 +123,36 @@ document.addEventListener('DOMContentLoaded', () => {
   carregarViagens();
   inicializarMenu();
 });
+// ======================================================
+// MENU HAMBURGER
+// ======================================================
+document.addEventListener('DOMContentLoaded', () => {
+    const hamburger = document.getElementById('hamburgerBtn');
+    const nav = document.getElementById('navMenu');
+
+    console.log("🔍 Menu encontrado?", hamburger, nav);
+
+    if (!hamburger || !nav) {
+        console.error("❌ Elementos do menu não encontrados!");
+        return;
+    }
+
+    hamburger.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        nav.classList.toggle('active');
+
+        console.log("🍔 Toggle do menu → agora está:", 
+            nav.classList.contains('active') ? "ABERTO" : "FECHADO"
+        );
+    });
+
+    // Fecha ao clicar fora
+    document.addEventListener('click', (e) => {
+        if (!nav.contains(e.target) && e.target !== hamburger) {
+            nav.classList.remove('active');
+        }
+    });
+});
+
