@@ -645,27 +645,66 @@ body {
   margin: 0;
   color: #2d5016;
   font-size: 1.3rem;
-  line# 🎯 PERFEITO, FERNANDO! VAMOS CORRIGIR OS 2 PROBLEMAS AGORA
+  /* ========================================
+   MENU HAMBURGER (MOBILE)
+   ======================================== */
 
-Pelos prints você mostrou:
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+  padding: 10px;
+}
 
-1. ❌ **A imagem não aparece** (só mostra o texto alternativo "África do Sul – Johannesburg...")
-2. ❌ **O menu hamburger (☰) não abre** quando clica nos 3 pontinhos
+.nav {
+  display: flex;
+  gap: 20px;
+}
 
-Vou resolver os DOIS problemas agora, um de cada vez.
+.nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
 
----
+.nav a:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
 
-# ✅ PROBLEMA 1: IMAGEM NÃO APARECE
+/* Mobile */
+@media (max-width: 768px) {
+  .hamburger {
+    display: block;
+  }
 
-Pelo print do Supabase, eu vi que:
+  .nav {
+    position: fixed;
+    top: 70px;
+    right: -100%;
+    background: #2d5016;
+    flex-direction: column;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: right 0.3s ease;
+    z-index: 1000;
+  }
 
-👉 **O campo `imagem_capa_url` está VAZIO (não aparece na tabela)**
+  .nav.active {
+    right: 20px;
+  }
 
-Isso confirma que você **não salvou a URL da imagem** no Supabase.
+  .nav a {
+    display: block;
+    padding: 12px 20px;
+    text-align: center;
+  }
+}
 
-## SOLUÇÃO RÁPIDA:
 
-1. No Supabase, clique na linha da "África do Sul"
-2. Role até encontrar a coluna `imagem_capa_url`
-3. **Cole esta URL**:
