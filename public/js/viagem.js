@@ -12,7 +12,7 @@ if (!viagemId) {
 }
 
 // =======================
-// CARREGAR VIAGEM
+// CARREGAR VIAGEM (MESMA LÓGICA PARA TODOS OS DESTINOS)
 // =======================
 async function carregarViagem() {
   console.log("🔎 Carregando viagem com id:", viagemId);
@@ -23,7 +23,7 @@ async function carregarViagem() {
     .eq("id", viagemId)
     .single();
 
-  console.log("📦 Dados da viagem recebidos:", viagem);
+  console.log("📦 Dados da viagem vindos do Supabase:", viagem);
 
   const erroEl = document.getElementById("erroViagem");
 
@@ -38,67 +38,75 @@ async function carregarViagem() {
 
   // ===== TÍTULO =====
   const titulo = viagem.nome_viagem || "Viagem";
-  document.getElementById("tituloViagem").textContent = titulo;
-  document.getElementById("tituloViagemCapa").textContent = titulo;
+  const tituloPage = document.getElementById("tituloViagem");
+  const tituloCapa = document.getElementById("tituloViagemCapa");
+  if (tituloPage) tituloPage.textContent = titulo;
+  if (tituloCapa) tituloCapa.textContent = titulo;
 
   // ===== DATAS =====
   const datasEl = document.getElementById("datasViagem");
-  if (viagem.data_saida && viagem.data_retorno) {
+  if (datasEl && viagem.data_saida && viagem.data_retorno) {
     const saida = formatarData(viagem.data_saida);
     const retorno = formatarData(viagem.data_retorno);
     datasEl.textContent = `${saida} a ${retorno}`;
-  } else {
-    datasEl.textContent = "";
   }
 
-  // ===== IMAGEM DE CAPA =====
+  // ===== IMAGEM DE CAPA (LOGO POR ENQUANTO) =====
   const imgEl = document.getElementById("imgCapaViagem");
   if (imgEl) {
-    // Usa a logo como capa padrão por enquanto
     imgEl.src = "/img/logo.png";
     imgEl.alt = titulo;
   }
 
-  // ===== ROTEIRO DIA A DIA =====
+  // ===== ROTEIRO DIA A DIA (USANDO roteiro_texto) =====
   const roteiroEl = document.getElementById("roteiroTexto");
-  const textoRoteiro = viagem.roteiro_texto;
-
-  if (textoRoteiro && textoRoteiro.trim().length > 0) {
-    // Cada quebra de linha no banco vira um <p> na tela
-    roteiroEl.innerHTML = textoRoteiro
-      .split("\n")
-      .map(linha => linha.trim())
-      .filter(linha => linha.length > 0)
-      .map(linha => `<p>${linha}</p>`)
-      .join("");
-  } else {
-    console.warn("⚠️ roteiro_texto vazio ou nulo para esta viagem.");
-    roteiroEl.innerHTML = "<p>Roteiro não disponível.</p>";
-  }
-
-  // ===== DICAS =====
-  const dicasEl = document.getElementById("dicasViagem");
-  if (dicasEl) {
-    if (viagem.dicas && viagem.dicas.trim().length > 0) {
-      dicasEl.innerHTML = viagem.dicas
-        .split("\n")
-        .map(l => l.trim())
-        .filter(l => l.length > 0)
-        .map(l => `<p>${l}</p>`)
-        .join("");
-    } else if (viagem.informacoes_uteis && viagem.informacoes_uteis.trim().length > 0) {
-      dicasEl.innerHTML = viagem.informacoes_uteis
+  if (roteiroEl) {
+    const texto = viagem.roteiro_texto;
+    if (texto && texto.trim().length > 0) {
+      roteiroEl.innerHTML = texto
         .split("\n")
         .map(l => l.trim())
         .filter(l => l.length > 0)
         .map(l => `<p>${l}</p>`)
         .join("");
     } else {
-      dicasEl.innerHTML = "<p>Dicas ainda não cadastradas.</p>";
+      roteiroEl.innerHTML = "<p>Roteiro não disponível.</p>";
     }
   }
 
-  // ===== BOTÃO PDF DO ROTEIRO =====
+  // ===== DICAS / INFORMAÇÕES =====
+  const dicasEl = document.getElementById("dicasViagem");
+  if (dicasEl) {
+    const blocos = [];
+
+    if (viagem.dicas && viagem.dicas.trim().length > 0) {
+      blocos.push(
+        viagem.dicas
+          .split("\n")
+          .map(l => l.trim())
+          .filter(l => l.length > 0)
+          .map(l => `<p>${l}</p>`)
+          .join("")
+      );
+    }
+
+    if (viagem.informacoes_uteis && viagem.informacoes_uteis.trim().length > 0) {
+      blocos.push(
+        "<h3>Informações Úteis</h3>" +
+          viagem.informacoes_uteis
+            .split("\n")
+            .map(l => l.trim())
+            .filter(l => l.length > 0)
+            .map(l => `<p>${l}</p>`)
+            .join("")
+      );
+    }
+
+    dicasEl.innerHTML =
+      blocos.length > 0 ? blocos.join("<hr>") : "<p>Dicas ainda não cadastradas.</p>";
+  }
+
+  // ===== PDF DO ROTEIRO =====
   const btnPdf = document.getElementById("btnGerarPdfRoteiro");
   if (btnPdf) {
     if (viagem.pdf_url) {
@@ -109,13 +117,11 @@ async function carregarViagem() {
     }
   }
 
-  // ===== WHATSAPP DO GUIA (SE TIVER) =====
+  // ===== WHATSAPP GUIA (SE TIVER) =====
   const linkWhats = document.querySelector('a[href*="wa.me"]');
   if (linkWhats && viagem.guia_whatsapp) {
     const numero = viagem.guia_whatsapp.replace(/\D/g, "");
-    if (numero) {
-      linkWhats.href = `https://wa.me/${numero}`;
-    }
+    if (numero) linkWhats.href = `https://wa.me/${numero}`;
   }
 }
 
@@ -127,12 +133,12 @@ function formatarData(valor) {
 }
 
 // =======================
-// CHECKLIST (se você já tem no HTML)
+// CHECKLIST (LOCALSTORAGE POR VIAGEM)
 // =======================
 function salvarChecklist() {
   if (!viagemId) return;
   const itens = {};
-  document.querySelectorAll(".checklist-item").forEach((cb) => {
+  document.querySelectorAll(".checklist-item").forEach(cb => {
     itens[cb.dataset.item] = cb.checked;
   });
   localStorage.setItem("checklist_" + viagemId, JSON.stringify(itens));
@@ -143,24 +149,21 @@ function carregarChecklist() {
   const salvo = localStorage.getItem("checklist_" + viagemId);
   if (!salvo) return;
   const itens = JSON.parse(salvo);
-  document.querySelectorAll(".checklist-item").forEach((cb) => {
+  document.querySelectorAll(".checklist-item").forEach(cb => {
     cb.checked = itens[cb.dataset.item] || false;
   });
 }
 
-document.querySelectorAll(".checklist-item").forEach((cb) => {
+document.querySelectorAll(".checklist-item").forEach(cb => {
   cb.addEventListener("change", salvarChecklist);
 });
 
 document
   .getElementById("btnGerarChecklistPdf")
   ?.addEventListener("click", () => {
-    alert("Depois implementamos o PDF do checklist aqui.");
+    alert("PDF do checklist será implementado depois.");
   });
 
-// =======================
-// BOTÃO SAIR
-// =======================
 document
   .getElementById("btnSairViagem")
   ?.addEventListener("click", async () => {
@@ -168,6 +171,5 @@ document
     window.location.href = "/login.html";
   });
 
-// =======================
 carregarViagem();
 carregarChecklist();
