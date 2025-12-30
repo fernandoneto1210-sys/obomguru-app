@@ -41,6 +41,33 @@ async function carregarViagem() {
     return;
   }
   if (erroEl) erroEl.style.display = "none";
+  // ===== METRÔ - LINKS POR CIDADE =====
+const linkMetro = document.getElementById("linkMetro");
+
+if (linkMetro) {
+  const nome = (viagem.nome_viagem || "").toLowerCase();
+
+  if (nome.includes("londres") || nome.includes("inglaterra")) {
+    linkMetro.href = "https://tfl.gov.uk/maps/track/tube";
+  } 
+  else if (nome.includes("paris")) {
+    linkMetro.href = "https://www.ratp.fr/en/plan-metro";
+  }
+  else if (nome.includes("nova york") || nome.includes("new york")) {
+    linkMetro.href = "https://new.mta.info/maps/subway";
+  }
+  else if (nome.includes("madrid")) {
+    linkMetro.href = "https://www.metromadrid.es/en/map";
+  }
+  else if (nome.includes("berlim") || nome.includes("berlin")) {
+    linkMetro.href = "https://www.bvg.de/en/tickets-and-fares/overview-metro-map";
+  }
+  else {
+    // Se a cidade não tiver metrô
+    linkMetro.href = "https://www.google.com/search?q=metro+da+cidade";
+  }
+}
+
 
   // ===== TÍTULO =====
   const titulo = viagem.nome_viagem || "Viagem";
@@ -316,3 +343,4 @@ document.getElementById("btnSairViagem")?.addEventListener("click", async () => 
 // INICIAR
 // =======================
 carregarViagem();
+
