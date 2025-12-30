@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin – Viagens</title>
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-page">
+
+<header class="admin-header">
+  <div class="container">
+    <h1>🌍 Painel Administrativo – Viagens</h1>
+    <button class="btn-logout" onclick="logout()">Sair</button>
+  </div>
+</header>
+
+<div class="admin-content">
+  <div class="card">
+    <h2>Viagens Cadastradas</h2>
+    <button class="btn-secondary" onclick="criarViagem()">➕ Nova Viagem</button>
+  </div>
+
+  <div id="listaViagens" class="card">
+    <p>Carregando viagens...</p>
+  </div>
+</div>
+
+<script type="module" src="../js/admin/viagens.js"></script>
+</body>
+</html>
