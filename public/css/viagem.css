@@ -476,3 +476,14 @@ body {
     font-size: 0.85rem;
   }
 }
+/* força correção visual do checklist até corrigirmos o HTML final */
+.checklist-section {
+  position: relative;
+  z-index: 10;
+}
+
+.checklist-section h2.section-title {
+  margin-left: 0 !important;
+  display: block;
+  width: 100%;
+}
