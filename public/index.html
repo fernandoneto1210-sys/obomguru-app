@@ -3,33 +3,105 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ObomGuru – Agência de Viagens</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="manifest" href="manifest.json">
+  <title>ObomGuru – Viagens Exclusivas desde São Lourenço</title>
+  <link rel="stylesheet" href="css/home.css">
 </head>
 <body>
-  <header class="header">
-    <img src="img/logo.png" alt="ObomGuru" class="logo">
-    <button class="hamburger" id="hamburgerBtn">☰</button>
-    <nav class="nav" id="navMenu">
-      <a href="login.html">Login</a>
-      <a href="admin.html">Admin</a>
+
+<!-- HEADER/NAVBAR -->
+<header class="navbar">
+  <div class="container">
+    <div class="logo">
+      <h1>🌍 ObomGuru</h1>
+      <p>Viagens Exclusivas desde São Lourenço</p>
+    </div>
+    <nav class="nav-links">
+      <a href="#viagens">Viagens</a>
+      <a href="#novos-destinos">Novos Destinos</a>
+      <a href="#contato">Contato</a>
+      <a href="/admin/" class="btn-admin">Admin</a>
     </nav>
-  </header>
+  </div>
+</header>
 
-  <section class="banner">
-    <h1>Novos grupos de destinos!</h1>
-    <p>Confira as próximas viagens: Buenos Aires, Peru, Marrocos, São Luiz do Maranhão e Fernando de Noronha – com acompanhamento desde São Lourenço.</p>
-  </section>
+<!-- HERO SECTION -->
+<section class="hero">
+  <div class="hero-content">
+    <h2>Explore o Mundo com a Gente</h2>
+    <p>Viagens com acompanhamento profissional desde São Lourenço</p>
+    <button class="btn-hero" onclick="scrollTo('viagens')">Conhecer Viagens</button>
+  </div>
+</section>
 
-  <section class="cards" id="cardsContainer">
-    <p>Carregando viagens disponíveis...</p>
-  </section>
+<!-- SEÇÃO: NOVOS DESTINOS (CHAMATIVA) -->
+<section id="novos-destinos" class="novos-destinos">
+  <div class="container">
+    <h2>🌟 NOVOS DESTINOS</h2>
+    <p class="destaque">Saídas com acompanhamento desde São Lourenço</p>
 
-  <footer class="footer">
-    <p>© 2025 ObomGuru – Todos os direitos reservados.</p>
-  </footer>
+    <div class="destinos-grid">
+      <div class="destino-card">
+        <div class="destino-icon">🇦🇷</div>
+        <h3>Buenos Aires</h3>
+        <p>A Paris da América Latina</p>
+      </div>
+      <div class="destino-card">
+        <div class="destino-icon">🇵🇪</div>
+        <h3>Peru</h3>
+        <p>Machu Picchu e Mistério Inca</p>
+      </div>
+      <div class="destino-card">
+        <div class="destino-icon">🇲🇦</div>
+        <h3>Marrocos</h3>
+        <p>Desertos e Medinas Fascinantes</p>
+      </div>
+      <div class="destino-card">
+        <div class="destino-icon">🏝️</div>
+        <h3>São Luís do Maranhão</h3>
+        <p>Patrimônio Cultural Brasileiro</p>
+      </div>
+      <div class="destino-card">
+        <div class="destino-icon">🏖️</div>
+        <h3>Fernando de Noronha</h3>
+        <p>Paraíso Tropical Preservado</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-  <script type="module" src="js/index.js"></script>
+<!-- SEÇÃO: VIAGENS DISPONÍVEIS -->
+<section id="viagens" class="viagens">
+  <div class="container">
+    <h2>✈️ Viagens Disponíveis</h2>
+    <p>Escolha seu próximo destino</p>
+
+    <div id="viagensGrid" class="viagens-grid">
+      <div class="loading">⏳ Carregando viagens...</div>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO: CONTATO -->
+<section id="contato" class="contato">
+  <div class="container">
+    <h2>📞 Entre em Contato</h2>
+    <p>Dúvidas? Fale com a gente!</p>
+    <div class="contato-info">
+      <a href="https://wa.me/5535988445517" target="_blank" class="btn-contato">
+        💬 WhatsApp
+      </a>
+      <a href="mailto:contato@obomguru.com" class="btn-contato">
+        📧 Email
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>&copy; 2025 ObomGuru – Viagens Exclusivas. Todos os direitos reservados.</p>
+</footer>
+
+<script type="module" src="js/home.js"></script>
 </body>
 </html>
