@@ -19,7 +19,13 @@ async function carregarViagem() {
 
   const { data: viagem, error } = await supabase
     .from("viagens")
-    .select("*")
+    .select(`
+      *,
+      destinos (
+        nome,
+        imagem_url
+      )
+    `)
     .eq("id", viagemId)
     .single();
 
@@ -49,6 +55,14 @@ async function carregarViagem() {
     const saida = formatarData(viagem.data_saida);
     const retorno = formatarData(viagem.data_retorno);
     datasEl.textContent = `${saida} a ${retorno}`;
+  }
+
+  // ===== IMAGEM DE CAPA (DA TABELA DESTINOS) =====
+  const capaEl = document.getElementById("capaViagem");
+  if (capaEl && viagem.destinos && viagem.destinos.imagem_url) {
+    capaEl.style.backgroundImage = `url(${viagem.destinos.imagem_url})`;
+    capaEl.style.backgroundSize = "cover";
+    capaEl.style.backgroundPosition = "center";
   }
 
   // ===== ROTEIRO DIA A DIA =====
@@ -95,45 +109,17 @@ async function carregarViagem() {
     }
   }
 
-  // ===== PDF DO ROTEIRO =====
-const btnPdf = document.getElementById("btnGerarPdfRoteiro");
-if (btnPdf) {
-  btnPdf.onclick = async () => {
-    try {
-      // Importa jsPDF dinamicamente
-      const { jsPDF } = await import("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
-
-      const pdf = new jsPDF();
-      const titulo = viagem.nome_viagem || "Roteiro de Viagem";
-      const roteiro = viagem.roteiro_texto || "Roteiro não disponível";
-
-      // Título
-      pdf.setFontSize(16);
-      pdf.setFont(undefined, 'bold');
-      pdf.text(titulo, 10, 15);
-
-      // Datas
-      if (viagem.data_saida && viagem.data_retorno) {
-        pdf.setFontSize(10);
-        pdf.setFont(undefined, 'normal');
-        const saida = formatarData(viagem.data_saida);
-        const retorno = formatarData(viagem.data_retorno);
-        pdf.text(`${saida} a ${retorno}`, 10, 25);
-      }
-
-      // Roteiro
-      pdf.setFontSize(11);
-      const linhas = pdf.splitTextToSize(roteiro, 180);
-      pdf.text(linhas, 10, 35);
-
-      // Download
-      pdf.save(`${titulo.replace(/[^a-z0-9]/gi, '_')}_roteiro.pdf`);
-    } catch (error) {
-      console.error("Erro ao gerar PDF:", error);
-      alert("Erro ao gerar PDF. Tente novamente.");
+  // ===== BOTÃO PDF DO ROTEIRO =====
+  const btnPdf = document.getElementById("btnGerarPdfRoteiro");
+  if (btnPdf) {
+    if (viagem.pdf_url) {
+      btnPdf.textContent = "📄 Baixar PDF do Roteiro";
+      btnPdf.onclick = () => window.open(viagem.pdf_url, "_blank");
+    } else {
+      // Gerar PDF do roteiro
+      btnPdf.onclick = () => gerarPdfRoteiro(titulo, viagem.roteiro_texto);
     }
-  };
-}
+  }
 
   // ===== WHATSAPP GUIA =====
   const linkWhats = document.querySelector('a[href*="wa.me"]');
@@ -148,6 +134,62 @@ function formatarData(valor) {
   const d = new Date(valor + "T00:00:00");
   if (isNaN(d.getTime())) return "";
   return d.toLocaleDateString("pt-BR");
+}
+
+// =======================
+// GERAR PDF DO ROTEIRO
+// =======================
+function gerarPdfRoteiro(titulo, roteiro) {
+  if (!roteiro || roteiro.trim().length === 0) {
+    alert("Roteiro não disponível para gerar PDF.");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+
+  pdf.setFontSize(18);
+  pdf.text(titulo, 10, 15);
+
+  pdf.setFontSize(12);
+  const linhas = pdf.splitTextToSize(roteiro, 180);
+  pdf.text(linhas, 10, 30);
+
+  pdf.save(`${titulo}-roteiro.pdf`);
+}
+
+// =======================
+// GERAR PDF DO CHECKLIST
+// =======================
+function gerarPdfChecklist() {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+
+  pdf.setFontSize(18);
+  pdf.text("Checklist da Viagem", 10, 15);
+
+  pdf.setFontSize(12);
+  let y = 30;
+
+  document.querySelectorAll(".checklist-card").forEach(card => {
+    const categoria = card.querySelector("h3").textContent;
+    pdf.setFont(undefined, "bold");
+    pdf.text(categoria, 10, y);
+    y += 8;
+
+    pdf.setFont(undefined, "normal");
+    card.querySelectorAll("label").forEach(label => {
+      const checkbox = label.querySelector(".checklist-item");
+      const texto = label.textContent.trim();
+      const marcado = checkbox.checked ? "[X]" : "[ ]";
+      pdf.text(`${marcado} ${texto}`, 15, y);
+      y += 6;
+    });
+
+    y += 5;
+  });
+
+  pdf.save("checklist-viagem.pdf");
 }
 
 // =======================
@@ -178,9 +220,8 @@ document.querySelectorAll(".checklist-item").forEach(cb => {
 
 document
   .getElementById("btnGerarChecklistPdf")
-  ?.addEventListener("click", () => {
-    alert("Função de gerar PDF do checklist será implementada.");
-  });
+  ?.addEventListener("click", gerarPdfChecklist);
+
 document
   .getElementById("btnSairViagem")
   ?.addEventListener("click", async () => {
@@ -191,5 +232,3 @@ document
 // =======================
 carregarViagem();
 carregarChecklist();
-
-
