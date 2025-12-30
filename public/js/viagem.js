@@ -10,6 +10,7 @@ const roteiroDiasEl = document.getElementById("roteiroDias");
 const dicasEl       = document.getElementById("dicas");
 const climaEl       = document.getElementById("clima");
 const mapaEl        = document.getElementById("mapa");
+const linkMapaEl    = document.getElementById("linkMapa");
 const linksEl       = document.getElementById("links");
 const pdfLinkEl     = document.getElementById("pdfLink");
 
@@ -58,7 +59,7 @@ async function carregarViagem() {
       console.error("Erro ao buscar roteiro_dias:", erroDias);
     }
 
-    preencherCabecalho(viagem);
+    preencherBanner(viagem);
     preencherRoteiro(dias || []);
     preencherCards(viagem);
 
@@ -68,7 +69,7 @@ async function carregarViagem() {
   }
 }
 
-function preencherCabecalho(viagem) {
+function preencherBanner(viagem) {
   nomeViagemEl.textContent = viagem.nome_viagem || "";
 
   const saida   = formatarData(viagem.data_saida);
@@ -100,16 +101,21 @@ function preencherRoteiro(dias) {
 }
 
 function preencherCards(viagem) {
-  // Dicas
+  // DICAS
   dicasEl.innerHTML = (viagem.dicas || "Sem dicas cadastradas.").replace(/\n/g, "<br>");
 
-  // Clima
+  // CLIMA
   climaEl.textContent = viagem.clima || "Informação de clima não cadastrada.";
 
-  // Mapa (placeholder por enquanto)
-  mapaEl.innerHTML = "Mapa interativo em breve.";
+  // MAPA (link para Google Maps do destino)
+  if (viagem.destinos?.nome) {
+    const query = encodeURIComponent(`${viagem.destinos.nome}, ${viagem.destinos.pais || ""}`);
+    linkMapaEl.href = `https://www.google.com/maps/search/?api=1&query=${query}`;
+  } else {
+    mapaEl.innerHTML = "Mapa não disponível.";
+  }
 
-  // Links úteis
+  // LINKS ÚTEIS
   if (!viagem.links_uteis) {
     linksEl.innerHTML = "Nenhum link disponível.";
   } else {
@@ -130,7 +136,7 @@ function preencherCards(viagem) {
       linksEl.innerHTML = lista
         .map(
           (item) =>
-            `<div style="margin-bottom:6px;"><a href="${item.url}" target="_blank" rel="noopener">→ ${item.nome}</a></div>`
+            `<a href="${item.url}" target="_blank" rel="noopener" class="card-link">→ ${item.nome}</a>`
         )
         .join("");
     }
