@@ -24,14 +24,13 @@ async function carregarViagem() {
     .single();
 
   console.log("📦 Dados da viagem:", viagem);
-  console.log("❌ Erro (se houver):", error);
 
   const erroEl = document.getElementById("erroViagem");
 
   if (error || !viagem) {
     console.error("❌ Erro ao buscar viagem:", error);
     if (erroEl) {
-      erroEl.textContent = "Viagem não encontrada. ID: " + viagemId;
+      erroEl.textContent = "Viagem não encontrada.";
       erroEl.style.display = "block";
     }
     return;
@@ -53,10 +52,19 @@ async function carregarViagem() {
     datasEl.textContent = `${saida} a ${retorno}`;
   }
 
-  // ===== IMAGEM DE CAPA (FUNDO GRADIENTE) =====
+  // ===== IMAGEM DE CAPA (DO STORAGE DO SUPABASE) =====
   const capaEl = document.getElementById("capaViagem");
-  if (capaEl) {
-    capaEl.style.backgroundImage = "linear-gradient(135deg, #e8f0f5, #d4e4f0)";
+  if (capaEl && viagem.imagem_url) {
+    // Monta a URL completa do Supabase Storage
+    const { data: publicUrl } = supabase.storage
+      .from("imagens")
+      .getPublicUrl(viagem.imagem_url);
+
+    if (publicUrl && publicUrl.publicUrl) {
+      capaEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url(${publicUrl.publicUrl})`;
+      capaEl.style.backgroundSize = "cover";
+      capaEl.style.backgroundPosition = "center";
+    }
   }
 
   // ===== ROTEIRO DIA A DIA =====
@@ -133,7 +141,7 @@ function formatarData(valor) {
 }
 
 // =======================
-// GERAR PDF DO ROTEIRO
+// GERAR PDF DO ROTEIRO (COM MÚLTIPLAS PÁGINAS)
 // =======================
 function gerarPdfRoteiro(titulo, roteiro) {
   if (!roteiro || roteiro.trim().length === 0) {
@@ -145,14 +153,38 @@ function gerarPdfRoteiro(titulo, roteiro) {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF();
 
+    const margemEsquerda = 10;
+    const margemDireita = 10;
+    const larguraPagina = 210; // A4
+    const larguraTexto = larguraPagina - margemEsquerda - margemDireita;
+    let y = 15;
+
+    // TÍTULO
     pdf.setFontSize(18);
     pdf.setFont(undefined, "bold");
-    pdf.text(titulo, 10, 15);
+    pdf.text(titulo, margemEsquerda, y);
+    y += 10;
 
+    // ROTEIRO
     pdf.setFontSize(11);
     pdf.setFont(undefined, "normal");
-    const linhas = pdf.splitTextToSize(roteiro, 180);
-    pdf.text(linhas, 10, 30);
+
+    const linhas = roteiro.split("\n").filter(l => l.trim());
+
+    linhas.forEach(linha => {
+      const textoQuebrado = pdf.splitTextToSize(linha, larguraTexto);
+
+      textoQuebrado.forEach(pedaco => {
+        if (y > 280) { // Fim da página
+          pdf.addPage();
+          y = 15;
+        }
+        pdf.text(pedaco, margemEsquerda, y);
+        y += 6;
+      });
+
+      y += 2; // Espaço entre parágrafos
+    });
 
     pdf.save(`${titulo.replace(/[^a-z0-9]/gi, "_")}_roteiro.pdf`);
   } catch (error) {
@@ -162,25 +194,33 @@ function gerarPdfRoteiro(titulo, roteiro) {
 }
 
 // =======================
-// GERAR PDF DO CHECKLIST
+// GERAR PDF DO CHECKLIST (COM MÚLTIPLAS PÁGINAS)
 // =======================
 function gerarPdfChecklist() {
   try {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF();
 
+    const margemEsquerda = 10;
+    let y = 15;
+
     pdf.setFontSize(18);
     pdf.setFont(undefined, "bold");
-    pdf.text("Checklist da Viagem", 10, 15);
+    pdf.text("Checklist da Viagem", margemEsquerda, y);
+    y += 15;
 
     pdf.setFontSize(11);
-    pdf.setFont(undefined, "normal");
-    let y = 30;
 
     document.querySelectorAll(".checklist-card").forEach(card => {
       const categoria = card.querySelector("h3").textContent;
+
+      if (y > 270) {
+        pdf.addPage();
+        y = 15;
+      }
+
       pdf.setFont(undefined, "bold");
-      pdf.text(categoria, 10, y);
+      pdf.text(categoria, margemEsquerda, y);
       y += 8;
 
       pdf.setFont(undefined, "normal");
@@ -188,13 +228,14 @@ function gerarPdfChecklist() {
         const checkbox = label.querySelector(".checklist-item");
         const texto = label.textContent.trim();
         const marcado = checkbox.checked ? "[X]" : "[ ]";
-        pdf.text(`${marcado} ${texto}`, 15, y);
-        y += 6;
 
-        if (y > 270) {
+        if (y > 280) {
           pdf.addPage();
-          y = 10;
+          y = 15;
         }
+
+        pdf.text(`${marcado} ${texto}`, margemEsquerda + 5, y);
+        y += 6;
       });
 
       y += 5;
