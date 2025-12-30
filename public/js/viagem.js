@@ -13,6 +13,11 @@ const mapaEl        = document.getElementById("mapa");
 const linkMapaEl    = document.getElementById("linkMapa");
 const linksEl       = document.getElementById("links");
 const pdfLinkEl     = document.getElementById("pdfLink");
+const btnGerarPdf   = document.getElementById("btnGerarPdf");
+const cardsSidebar  = document.getElementById("cardsSidebar");
+
+let viagemData = null;
+let diasData = [];
 
 async function carregarViagem() {
   if (!viagemId) {
@@ -33,6 +38,11 @@ async function carregarViagem() {
         clima,
         pdf_url,
         links_uteis,
+        moeda,
+        tomadas,
+        seguranca,
+        guia_nome,
+        guia_whatsapp,
         destinos (
           nome,
           pais,
@@ -48,6 +58,8 @@ async function carregarViagem() {
       return;
     }
 
+    viagemData = viagem;
+
     // 2. Buscar roteiro dia a dia
     const { data: dias, error: erroDias } = await supabase
       .from("roteiro_dias")
@@ -58,6 +70,8 @@ async function carregarViagem() {
     if (erroDias) {
       console.error("Erro ao buscar roteiro_dias:", erroDias);
     }
+
+    diasData = dias || [];
 
     preencherBanner(viagem);
     preencherRoteiro(dias || []);
@@ -106,17 +120,17 @@ function preencherCards(viagem) {
 
   // CLIMA (com link para previsão do tempo)
   if (viagem.clima) {
-    const cidadeClima = viagem.destinos?.nome || "Londres"; // fallback
+    const cidadeClima = viagem.destinos?.nome || "Londres";
     const paisClima = viagem.destinos?.pais || "Reino Unido";
     const queryClima = encodeURIComponent(`${cidadeClima}, ${paisClima} weather`);
     const linkClima = `https://www.google.com/search?q=${queryClima}`;
 
-   climaEl.innerHTML = `
-  <p style="margin-bottom:8px; color:#fff;">${viagem.clima}</p>
-  <a href="${linkClima}" target="_blank" rel="noopener" style="font-size:0.88rem;">
-    🌤️ Ver previsão completa
-  </a>
-`;
+    climaEl.innerHTML = `
+      <p style="margin-bottom:8px; color:#fff;">${viagem.clima}</p>
+      <a href="${linkClima}" target="_blank" rel="noopener" style="font-size:0.88rem;">
+        🌤️ Ver previsão completa
+      </a>
+    `;
   } else {
     climaEl.textContent = "Informação de clima não cadastrada.";
   }
@@ -156,6 +170,29 @@ function preencherCards(viagem) {
     }
   }
 
+  // CARDS ADICIONAIS: MOEDA, TOMADAS, SEGURANÇA
+  adicionarCardExtra(viagem.moeda, "💰 MOEDA");
+  adicionarCardExtra(viagem.tomadas, "🔌 TOMADAS");
+  adicionarCardExtra(viagem.seguranca, "🔒 SEGURANÇA");
+
+  // WHATSAPP DO GUIA
+  if (viagem.guia_whatsapp) {
+    const numeroLimpo = viagem.guia_whatsapp.replace(/\D/g, "");
+    const nomeGuia = viagem.guia_nome || "Guia";
+    const linkWhatsapp = `https://wa.me/${numeroLimpo}`;
+
+    const cardWhatsapp = document.createElement("div");
+    cardWhatsapp.classList.add("card");
+    cardWhatsapp.innerHTML = `
+      <h3>💬 FALAR COM O GUIA</h3>
+      <p style="margin-bottom:8px;">${nomeGuia}</p>
+      <a href="${linkWhatsapp}" target="_blank" rel="noopener">
+        Abrir WhatsApp
+      </a>
+    `;
+    cardsSidebar.insertBefore(cardWhatsapp, btnGerarPdf);
+  }
+
   // PDF
   if (viagem.pdf_url) {
     pdfLinkEl.href = viagem.pdf_url;
@@ -165,11 +202,59 @@ function preencherCards(viagem) {
   }
 }
 
+function adicionarCardExtra(conteudo, titulo) {
+  if (!conteudo) return;
+
+  const card = document.createElement("div");
+  card.classList.add("card");
+  card.innerHTML = `
+    <h3>${titulo}</h3>
+    <p>${conteudo.replace(/\n/g, "<br>")}</p>
+  `;
+  cardsSidebar.insertBefore(card, btnGerarPdf);
+}
+
 function formatarData(iso) {
   if (!iso) return "";
   const [y, m, d] = iso.split("-");
   return `${d}/${m}/${y}`;
 }
 
-carregarViagem();
+// GERAR PDF
+btnGerarPdf.addEventListener("click", () => {
+  if (!viagemData || !diasData.length) {
+    alert("Dados da viagem não carregados ainda.");
+    return;
+  }
 
+  const docDefinition = {
+    content: [
+      { text: viagemData.nome_viagem, style: "header", alignment: "center" },
+      { 
+        text: `${formatarData(viagemData.data_saida)} → ${formatarData(viagemData.data_retorno)}`, 
+        style: "subheader", 
+        alignment: "center" 
+      },
+      { text: "\n" },
+      { text: "ROTEIRO DIA A DIA", style: "sectionTitle" },
+      { text: "\n" },
+      ...diasData.map((d) => [
+        { text: `DIA ${d.dia}: ${d.titulo}`, style: "diaTitle" },
+        { text: d.descricao || "", style: "diaDesc" },
+        { text: "\n" }
+      ]).flat()
+    ],
+    styles: {
+      header: { fontSize: 20, bold: true, color: "#27ae60" },
+      subheader: { fontSize: 14, italics: true, color: "#555" },
+      sectionTitle: { fontSize: 16, bold: true, color: "#2c3e50" },
+      diaTitle: { fontSize: 13, bold: true, margin: [0, 10, 0, 5], color: "#34495e" },
+      diaDesc: { fontSize: 11, margin: [0, 0, 0, 10], alignment: "justify" }
+    },
+    pageMargins: [40, 60, 40, 60]
+  };
+
+  pdfMake.createPdf(docDefinition).download(`roteiro_${viagemData.nome_viagem.replace(/\s+/g, "_")}.pdf`);
+});
+
+carregarViagem();
