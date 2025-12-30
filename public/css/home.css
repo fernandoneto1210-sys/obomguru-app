@@ -39,6 +39,27 @@ body {
   font-weight: 700;
   margin-bottom: 2px;
 }
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-img {
+  height: 80px;        /* ajuste se precisar maior/menor */
+  width: auto;
+}
+
+.logo-text h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.logo-text p {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
 
 .logo p {
   font-size: 0.8rem;
