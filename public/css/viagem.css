@@ -51,9 +51,21 @@ body {
 }
 
 .logo-img {
-  height: 65px;
+  height: 85px;
   width: auto;
   display: block;
+}
+
+@media (max-width: 768px) {
+  .logo-img {
+    height: 68px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-img {
+    height: 55px;
+  }
 }
 
 /* ========================================
