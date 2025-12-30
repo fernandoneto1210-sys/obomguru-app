@@ -7,7 +7,10 @@
   <link rel="stylesheet" href="/css/viagem.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
+
 <body>
+
+  <!-- HEADER ORIGINAL (NÃO ALTEREI) -->
   <header class="viagem-header">
     <div class="container">
       <h1>🌍 O Bom Guru</h1>
@@ -15,110 +18,95 @@
     </div>
   </header>
 
-  <main class="viagem-main">
+  <!-- CAPA (RESTAURADA) -->
+  <section class="viagem-capa">
+    <img id="imgCapaViagem" src="" alt="Capa da viagem">
+    <div class="capa-overlay">
+      <h1 id="tituloViagemCapa"></h1>
+      <p id="datasViagem"></p>
+    </div>
+  </section>
+
+  <main class="viagem-main container">
+
     <div id="erroViagem" class="error-msg"></div>
 
-    <!-- Capa da Viagem -->
-    <section class="viagem-capa">
-      <img id="imgCapaViagem" src="" alt="Capa da viagem">
-      <div class="capa-overlay">
-        <h1 id="tituloViagemCapa"></h1>
-        <p id="datasViagem"></p>
+    <!-- ROTEIRO (DO JEITO ANTIGO) -->
+    <section class="roteiro-section">
+      <h2>📅 Roteiro Dia a Dia</h2>
+      <div id="roteiroTexto"></div>
+      <button id="btnGerarPdfRoteiro" class="btn btn-primary">📄 Gerar PDF do Roteiro</button>
+    </section>
+
+    <!-- CHECKLIST (NOVO, SEM QUEBRAR A CAPA) -->
+    <section class="checklist-section">
+      <h2>📋 Checklist da Viagem</h2>
+
+      <div class="checklist-grid">
+
+        <div class="checklist-card">
+          <h3>Documentação</h3>
+          <label><input type="checkbox" class="checklist-item" data-item="passaporte"> Passaporte válido</label>
+          <label><input type="checkbox" class="checklist-item" data-item="visto"> Visto (se necessário)</label>
+          <label><input type="checkbox" class="checklist-item" data-item="seguro"> Seguro Viagem</label>
+          <label><input type="checkbox" class="checklist-item" data-item="carteira"> Carteira motorista int.</label>
+        </div>
+
+        <div class="checklist-card">
+          <h3>Saúde</h3>
+          <label><input type="checkbox" class="checklist-item" data-item="vacinas"> Vacinas</label>
+          <label><input type="checkbox" class="checklist-item" data-item="remedios"> Remédios</label>
+          <label><input type="checkbox" class="checklist-item" data-item="receitas"> Receitas Médicas</label>
+        </div>
+
+        <div class="checklist-card">
+          <h3>Bagagem</h3>
+          <label><input type="checkbox" class="checklist-item" data-item="roupas"> Roupas adequadas</label>
+          <label><input type="checkbox" class="checklist-item" data-item="calcados"> Calçados</label>
+          <label><input type="checkbox" class="checklist-item" data-item="adaptador"> Adaptador de tomada</label>
+        </div>
+
+        <div class="checklist-card">
+          <h3>Financeiro</h3>
+          <label><input type="checkbox" class="checklist-item" data-item="cartao"> Cartão internacional</label>
+          <label><input type="checkbox" class="checklist-item" data-item="moeda"> Moeda local</label>
+          <label><input type="checkbox" class="checklist-item" data-item="banco"> Avisar banco</label>
+        </div>
+
+      </div>
+
+      <button id="btnGerarChecklistPdf" class="btn btn-success">📄 Gerar PDF do Checklist</button>
+    </section>
+
+    <!-- DICAS -->
+    <section class="dicas-section">
+      <h2>💡 Dicas e Informações</h2>
+      <div id="dicasViagem"></div>
+    </section>
+
+    <!-- LINKS ÚTEIS -->
+    <section class="cards-section">
+      <div class="cards-grid">
+
+        <div class="info-card">
+          <h3>🌡️ Clima</h3>
+          <p>Veja a previsão do tempo.</p>
+          <a href="https://www.weather.com" target="_blank" class="btn btn-secondary">Ver Clima</a>
+        </div>
+
+        <div class="info-card">
+          <h3>🗺️ Mapas</h3>
+          <p>Abra o Google Maps</p>
+          <a href="https://www.google.com/maps" target="_blank" class="btn btn-secondary">Abrir Mapas</a>
+        </div>
+
       </div>
     </section>
 
-    <div class="container">
-      <!-- Roteiro Detalhado -->
-      <section class="roteiro-section">
-        <h2>📅 Roteiro Dia a Dia</h2>
-        <div id="roteiroTexto" class="roteiro-content"></div>
-        <button id="btnGerarPdfRoteiro" class="btn btn-primary">📄 Gerar PDF do Roteiro</button>
-      </section>
-
-      <!-- CHECKLIST DA VIAGEM -->
-      <section class="checklist-section">
-        <h2>✅ Checklist da Viagem</h2>
-        <p class="checklist-intro">Marque os itens conforme for preparando sua viagem e gere um PDF para acompanhar!</p>
-
-        <div class="checklist-grid">
-          <div class="checklist-card">
-            <h3>📄 Documentação</h3>
-            <label><input type="checkbox" class="checklist-item" data-item="passaporte"> Passaporte válido (mínimo 6 meses)</label>
-            <label><input type="checkbox" class="checklist-item" data-item="visto"> Visto (se necessário)</label>
-            <label><input type="checkbox" class="checklist-item" data-item="seguro"> Seguro viagem contratado</label>
-            <label><input type="checkbox" class="checklist-item" data-item="carteira"> Carteira de motorista internacional</label>
-            <label><input type="checkbox" class="checklist-item" data-item="comprovantes"> Comprovantes de reservas</label>
-          </div>
-
-          <div class="checklist-card">
-            <h3>💉 Saúde</h3>
-            <label><input type="checkbox" class="checklist-item" data-item="vacinas"> Vacinas em dia</label>
-            <label><input type="checkbox" class="checklist-item" data-item="remedios"> Remédios de uso contínuo</label>
-            <label><input type="checkbox" class="checklist-item" data-item="receitas"> Receitas médicas</label>
-            <label><input type="checkbox" class="checklist-item" data-item="kit"> Kit de primeiros socorros</label>
-          </div>
-
-          <div class="checklist-card">
-            <h3>🎒 Bagagem</h3>
-            <label><input type="checkbox" class="checklist-item" data-item="roupas"> Roupas adequadas ao clima</label>
-            <label><input type="checkbox" class="checklist-item" data-item="calcados"> Calçados confortáveis</label>
-            <label><input type="checkbox" class="checklist-item" data-item="adaptador"> Adaptador de tomada</label>
-            <label><input type="checkbox" class="checklist-item" data-item="carregadores"> Carregadores e cabos</label>
-            <label><input type="checkbox" class="checklist-item" data-item="higiene"> Itens de higiene pessoal</label>
-          </div>
-
-          <div class="checklist-card">
-            <h3>💳 Financeiro</h3>
-            <label><input type="checkbox" class="checklist-item" data-item="cartao"> Cartão de crédito internacional</label>
-            <label><input type="checkbox" class="checklist-item" data-item="moeda"> Moeda local</label>
-            <label><input type="checkbox" class="checklist-item" data-item="banco"> Avisar banco sobre viagem</label>
-            <label><input type="checkbox" class="checklist-item" data-item="limite"> Verificar limite do cartão</label>
-          </div>
-        </div>
-
-        <div class="checklist-progress">
-          <p>Progresso: <strong id="checklistProgress">0/20</strong> itens concluídos</p>
-          <div class="progress-bar">
-            <div id="progressFill" class="progress-fill"></div>
-          </div>
-        </div>
-
-        <button id="btnGerarChecklistPdf" class="btn btn-success">📄 Gerar PDF do Checklist</button>
-      </section>
-
-      <!-- Dicas e Informações -->
-      <section class="dicas-section">
-        <h2>💡 Dicas e Informações Úteis</h2>
-        <div id="dicasViagem" class="dicas-content"></div>
-      </section>
-
-      <!-- Cards Úteis -->
-      <section class="cards-section">
-        <div class="cards-grid">
-          <div class="info-card">
-            <h3>🌡️ Clima</h3>
-            <p>Consulte a previsão do tempo para se preparar melhor!</p>
-            <a href="https://www.weather.com" target="_blank" class="btn btn-secondary">Ver Clima</a>
-          </div>
-
-          <div class="info-card">
-            <h3>🗺️ Mapas</h3>
-            <p>Explore os destinos e planeje seus passeios.</p>
-            <a href="https://www.google.com/maps" target="_blank" class="btn btn-secondary">Abrir Mapas</a>
-          </div>
-
-          <div class="info-card">
-            <h3>📞 Contato</h3>
-            <p>Tire suas dúvidas diretamente com a gente!</p>
-            <a href="https://wa.me/5535999999999" target="_blank" class="btn btn-secondary">WhatsApp</a>
-          </div>
-        </div>
-      </section>
-    </div>
   </main>
 
   <footer class="viagem-footer">
-    <p>&copy; 2025 O Bom Guru - Agência de Viagens</p>
+    <p>&copy; 2025 O Bom Guru</p>
   </footer>
 
   <script type="module" src="/js/viagem.js"></script>
