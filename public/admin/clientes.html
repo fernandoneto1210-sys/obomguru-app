@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciar Clientes | O Bom Guru</title>
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <header class="admin-header">
+    <div class="container">
+      <div class="header-content">
+        <h1>👥 Painel Administrativo – Clientes</h1>
+        <nav class="admin-nav">
+          <a href="/admin/viagens.html" class="nav-link">📋 Viagens</a>
+          <a href="/admin/clientes.html" class="nav-link active">👥 Clientes</a>
+          <button id="btnSair" class="btn-sair">Sair</button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-main">
+    <div class="container">
+      <div class="page-header">
+        <h2>Gerenciar Clientes</h2>
+        <button id="btnNovoCliente" class="btn btn-primary">+ Novo Cliente</button>
+      </div>
+
+      <div id="listaClientes" class="clientes-grid">
+        <!-- Clientes carregados via JS -->
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Novo/Editar Cliente -->
+  <div id="modalCliente" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3 id="modalTitulo">Novo Cliente</h3>
+      <form id="formCliente">
+        <input type="hidden" id="clienteId">
+
+        <div class="form-group">
+          <label for="clienteNome">Nome Completo *</label>
+          <input type="text" id="clienteNome" required>
+        </div>
+
+        <div class="form-group">
+          <label for="clienteEmail">E-mail *</label>
+          <input type="email" id="clienteEmail" required>
+        </div>
+
+        <div class="form-group">
+          <label for="clienteTelefone">Telefone/WhatsApp</label>
+          <input type="tel" id="clienteTelefone" placeholder="(00) 00000-0000">
+        </div>
+
+        <div class="form-group">
+          <label for="clienteViagem">Viagem Vinculada</label>
+          <select id="clienteViagem">
+            <option value="">Nenhuma viagem</option>
+            <!-- Viagens carregadas via JS -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="clienteSenha">Senha <small>(deixe vazio para manter atual)</small></label>
+          <input type="password" id="clienteSenha" placeholder="Mínimo 6 caracteres">
+          <small class="form-hint">Apenas preencha se for criar novo cliente ou alterar senha</small>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" id="btnCancelar">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="/js/admin-clientes.js"></script>
+</body>
+</html>
