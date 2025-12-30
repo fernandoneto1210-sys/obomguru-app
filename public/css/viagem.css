@@ -370,5 +370,105 @@ body {
    FOOTER
 ======================================== */
 .viagem-footer {
-  background: #0
+  background: #0f3b21;
+  color: #fff;
+  text-align: center;
+  padding: 1.4rem 0;
+  font-size: 0.9rem;
+}
 
+/* ========================================
+   RESPONSIVO
+======================================== */
+@media (max-width: 768px) {
+  .logo-img {
+    height: 65px;
+  }
+
+  .viagem-capa {
+    height: 260px;
+  }
+
+  .capa-overlay {
+    padding: 1.5rem 2rem;
+  }
+
+  .capa-overlay h1 {
+    font-size: 1.7rem;
+  }
+
+  .capa-overlay p {
+    font-size: 0.95rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .section-title {
+    font-size: 1.2rem;
+  }
+
+  .checklist-grid,
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-primary,
+  .btn-success {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-img {
+    height: 55px;
+  }
+
+  .viagem-capa {
+    height: 220px;
+  }
+
+  .capa-overlay {
+    padding: 1rem 1.5rem;
+  }
+
+  .capa-overlay h1 {
+    font-size: 1.4rem;
+  }
+
+  .capa-overlay p {
+    font-size: 0.9rem;
+  }
+
+  .card {
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+  }
+
+  .roteiro-content p {
+    font-size: 0.9rem;
+    padding: 0.6rem 0.8rem;
+  }
+
+  .dica-box {
+    padding: 1.2rem;
+  }
+
+  .dica-box h3 {
+    font-size: 1rem;
+  }
+
+  .dica-box p {
+    font-size: 0.9rem;
+  }
+
+  .btn-sair {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+}
