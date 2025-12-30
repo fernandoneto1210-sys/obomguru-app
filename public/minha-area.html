@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minha Área – ObomGuru</title>
+  <link rel="stylesheet" href="css/home.css">
+  <style>
+    .minha-area-header {
+      background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+      color: #fff;
+      padding: 20px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .minha-area-header .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .usuario-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .usuario-info p {
+      font-size: 0.95rem;
+    }
+
+    .btn-sair {
+      background: #e74c3c;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .btn-sair:hover {
+      background: #c0392b;
+    }
+
+    .viagens-section {
+      padding: 60px 20px;
+      background: #fff;
+    }
+
+    .viagens-section h2 {
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 40px;
+      color: #2c3e50;
+    }
+
+    .viagens-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 28px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .viagem-card {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+    }
+
+    .viagem-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+    }
+
+    .viagem-img {
+      width: 100%;
+      height: 200px;
+      background-size: cover;
+      background-position: center;
+      background-color: #34495e;
+    }
+
+    .viagem-info {
+      padding: 20px;
+    }
+
+    .viagem-info h3 {
+      font-size: 1.3rem;
+      color: #2c3e50;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .viagem-destino {
+      color: #27ae60;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .viagem-datas {
+      color: #7f8c8d;
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+    }
+
+    .btn-ver {
+      width: 100%;
+      background: #27ae60;
+      color: #fff;
+      border: none;
+      padding: 12px 0;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-ver:hover {
+      background: #229954;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: #7f8c8d;
+      font-size: 1.1rem;
+    }
+
+    .sem-viagens {
+      text-align: center;
+      padding: 60px 20px;
+      color: #7f8c8d;
+    }
+
+    .sem-viagens h3 {
+      font-size: 1.3rem;
+      color: #2c3e50;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .minha-area-header .container {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .viagens-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .viagens-section h2 {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER COM LOGO -->
+<header class="navbar">
+  <div class="container">
+    <div class="logo">
+      <img src="img/logo.png" alt="Logo da agência" class="logo-img">
+      <div class="logo-text">
+        <h1>ObomGuru</h1>
+        <p>Viagens Exclusivas desde São Lourenço</p>
+      </div>
+    </div>
+    <nav class="nav-links">
+      <a href="/">Voltar</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HEADER DA ÁREA DO CLIENTE -->
+<header class="minha-area-header">
+  <div class="container">
+    <div class="usuario-info">
+      <span>👤</span>
+      <p id="nomeUsuario">Carregando...</p>
+    </div>
+    <button class="btn-sair" onclick="logout()">🚪 Sair</button>
+  </div>
+</header>
+
+<!-- SEÇÃO DE VIAGENS -->
+<section class="viagens-section">
+  <h2>✈️ Minhas Viagens</h2>
+  <div id="viagensGrid" class="viagens-grid">
+    <div class="loading">⏳ Carregando viagens...</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>&copy; 2025 ObomGuru – Viagens Exclusivas. Todos os direitos reservados.</p>
+</footer>
+
+<script type="module" src="js/minha-area.js"></script>
+</body>
+</html>
