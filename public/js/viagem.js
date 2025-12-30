@@ -26,15 +26,11 @@ function formatarData(valor) {
 async function carregarViagem() {
   if (!viagemId) return;
 
-  console.log("Carregando viagem:", viagemId);
-
   const { data: viagem, error } = await supabase
     .from("viagens")
     .select("*")
     .eq("id", viagemId)
     .single();
-
-  console.log("Viagem:", viagem, "Erro:", error);
 
   if (error || !viagem) {
     console.error(error);
@@ -44,7 +40,6 @@ async function carregarViagem() {
     }
     return;
   }
-
   if (erroEl) erroEl.style.display = "none";
 
   // ===== TÍTULO =====
@@ -64,29 +59,18 @@ async function carregarViagem() {
     datasEl.textContent = `${saida} a ${retorno}`;
   }
 
-  // ===== IMAGEM DE CAPA (SUPABASE STORAGE) =====
+  // ===== IMAGEM DE CAPA (USANDO LINK DIRETO DO BANCO) =====
   const capaEl = document.getElementById("capaViagem");
   if (capaEl) {
-    // coluna no banco com o NOME DO ARQUIVO no bucket 'imagens'
-    // ex: "londres.jpg", "africa-do-sul.jpg", "Punta-Cana-O-que-Fazer-....jpg"
-    const caminhoImagem = viagem.imagem_capa; // SE A COLUNA TIVER OUTRO NOME, TROCAR AQUI
+    const urlDireta = viagem.imagem_capa;
 
-    if (caminhoImagem) {
-      const { data } = supabase.storage
-        .from("imagens")
-        .getPublicUrl(caminhoImagem);
-
-      if (data && data.publicUrl) {
-        capaEl.style.backgroundImage = `
-          linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.65)),
-          url('${data.publicUrl}')
-        `;
-        capaEl.style.backgroundSize = "cover";
-        capaEl.style.backgroundPosition = "center";
-      } else {
-        // fallback – só o gradiente claro
-        capaEl.style.backgroundImage = "linear-gradient(135deg, #e8f0f5, #d4e4f0)";
-      }
+    if (urlDireta && urlDireta.startsWith("http")) {
+      capaEl.style.backgroundImage = `
+        linear-gradient(rgba(0,0,0,0.30), rgba(0,0,0,0.65)),
+        url('${urlDireta}')
+      `;
+      capaEl.style.backgroundSize = "cover";
+      capaEl.style.backgroundPosition = "center center";
     } else {
       capaEl.style.backgroundImage = "linear-gradient(135deg, #e8f0f5, #d4e4f0)";
     }
@@ -151,13 +135,6 @@ async function carregarViagem() {
       gerarPdfRoteiro(titulo, viagem.roteiro_texto || "");
   }
 
-  // ===== WHATSAPP GUIA (OPCIONAL) =====
-  const linkWhats = document.querySelector('a[href*="wa.me"]');
-  if (linkWhats && viagem.guia_whatsapp) {
-    const numero = viagem.guia_whatsapp.replace(/\D/g, "");
-    if (numero) linkWhats.href = `https://wa.me/${numero}`;
-  }
-
   carregarChecklist();
 }
 
@@ -170,46 +147,41 @@ function gerarPdfRoteiro(titulo, roteiro) {
     return;
   }
 
-  try {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ unit: "mm", format: "a4" });
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ unit: "mm", format: "a4" });
 
-    const marginLeft = 15;
-    const marginTop = 20;
-    const lineHeight = 6;
-    const maxLineWidth = 180;
-    const pageHeight = 297;
-    const bottomMargin = 20;
+  const marginLeft = 15;
+  const marginTop = 20;
+  const lineHeight = 6;
+  const maxLineWidth = 180;
+  const pageHeight = 297;
+  const bottomMargin = 20;
 
-    pdf.setFontSize(16);
-    pdf.setFont(undefined, "bold");
-    pdf.text(titulo, marginLeft, marginTop);
+  pdf.setFontSize(16);
+  pdf.setFont(undefined, "bold");
+  pdf.text(titulo, marginLeft, marginTop);
 
-    let y = marginTop + 10;
+  let y = marginTop + 10;
 
-    pdf.setFontSize(11);
-    pdf.setFont(undefined, "normal");
+  pdf.setFontSize(11);
+  pdf.setFont(undefined, "normal");
 
-    const linhas = roteiro.split("\n").filter(l => l.trim());
+  const linhas = roteiro.split("\n").filter(l => l.trim());
 
-    linhas.forEach(linha => {
-      const partes = pdf.splitTextToSize(linha, maxLineWidth);
-      partes.forEach(p => {
-        if (y + lineHeight > pageHeight - bottomMargin) {
-          pdf.addPage();
-          y = marginTop;
-        }
-        pdf.text(p, marginLeft, y);
-        y += lineHeight;
-      });
-      y += 2; // espaço entre parágrafos
+  linhas.forEach(linha => {
+    const partes = pdf.splitTextToSize(linha, maxLineWidth);
+    partes.forEach(p => {
+      if (y + lineHeight > pageHeight - bottomMargin) {
+        pdf.addPage();
+        y = marginTop;
+      }
+      pdf.text(p, marginLeft, y);
+      y += lineHeight;
     });
+    y += 2;
+  });
 
-    pdf.save(`${titulo.replace(/[^a-z0-9]/gi, "_")}_roteiro.pdf`);
-  } catch (e) {
-    console.error("Erro ao gerar PDF do roteiro:", e);
-    alert("Erro ao gerar PDF do roteiro.");
-  }
+  pdf.save(`${titulo.replace(/[^a-z0-9]/gi, "_")}_roteiro.pdf`);
 }
 
 // =======================
@@ -235,61 +207,53 @@ function carregarChecklist() {
 }
 
 // =======================
-// PDF DO CHECKLIST
+// PDF CHECKLIST
 // =======================
 function gerarPdfChecklist() {
-  try {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF();
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
 
-    let y = 15;
-    pdf.setFontSize(18);
+  let y = 15;
+  pdf.setFontSize(18);
+  pdf.setFont(undefined, "bold");
+  pdf.text("Checklist da Viagem", 10, y);
+  y += 15;
+
+  document.querySelectorAll(".checklist-card").forEach(card => {
+    const categoria = card.querySelector("h3").textContent;
+
+    if (y > 270) {
+      pdf.addPage();
+      y = 15;
+    }
+
+    pdf.setFontSize(14);
     pdf.setFont(undefined, "bold");
-    pdf.text("Checklist da Viagem", 10, y);
-    y += 15;
+    pdf.text(categoria, 10, y);
+    y += 10;
 
-    document.querySelectorAll(".checklist-card").forEach(card => {
-      const categoria = card.querySelector("h3").textContent;
+    pdf.setFontSize(12);
+    pdf.setFont(undefined, "normal");
 
-      if (y > 270) {
+    card.querySelectorAll("label").forEach(label => {
+      const cb = label.querySelector("input");
+      const marcado = cb.checked ? "[X]" : "[ ]";
+      const texto = label.innerText.trim();
+
+      if (y > 280) {
         pdf.addPage();
         y = 15;
       }
 
-      pdf.setFontSize(14);
-      pdf.setFont(undefined, "bold");
-      pdf.text(categoria, 10, y);
-      y += 10;
-
-      pdf.setFontSize(12);
-      pdf.setFont(undefined, "normal");
-
-      card.querySelectorAll("label").forEach(label => {
-        const cb = label.querySelector("input");
-        const marcado = cb.checked ? "[X]" : "[ ]";
-        const texto = label.innerText.trim();
-
-        if (y > 280) {
-          pdf.addPage();
-          y = 15;
-        }
-
-        pdf.text(`${marcado} ${texto}`, 15, y);
-        y += 7;
-      });
-
-      y += 5;
+      pdf.text(`${marcado} ${texto}`, 15, y);
+      y += 7;
     });
 
-    pdf.save("checklist-viagem.pdf");
-  } catch (e) {
-    console.error("Erro ao gerar PDF do checklist:", e);
-    alert("Erro ao gerar PDF do checklist.");
-  }
+    y +=pdf.save("checklist-viagem.pdf");
 }
 
 // =======================
-// EVENTOS GERAIS
+// EVENTOS
 // =======================
 document
   .getElementById("btnGerarChecklistPdf")
