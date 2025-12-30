@@ -12,16 +12,15 @@ const climaEl       = document.getElementById("clima");
 const mapaEl        = document.getElementById("mapa");
 const linkMapaEl    = document.getElementById("linkMapa");
 const linksEl       = document.getElementById("links");
-const pdfLinkEl     = document.getElementById("pdfLink");
 const btnGerarPdf   = document.getElementById("btnGerarPdf");
 const cardsSidebar  = document.getElementById("cardsSidebar");
 
 let viagemData = null;
 let diasData = [];
 
-// ========================================
-// HELPER: Converter URL de imagem para Base64
-// ========================================
+// ========================
+// Helper: URL -> Base64
+// ========================
 async function urlToBase64(url) {
   try {
     const response = await fetch(url);
@@ -38,9 +37,9 @@ async function urlToBase64(url) {
   }
 }
 
-// ========================================
-// CARREGAR VIAGEM
-// ========================================
+// ========================
+// Carregar viagem
+// ========================
 async function carregarViagem() {
   if (!viagemId) {
     nomeViagemEl.textContent = "Viagem não encontrada (sem ID na URL)";
@@ -48,7 +47,7 @@ async function carregarViagem() {
   }
 
   try {
-    // 1. Buscar viagem
+    // 1) Buscar viagem SEM fazer join obrigatório com destinos
     const { data: viagem, error: erroViagem } = await supabase
       .from("viagens")
       .select(`
@@ -65,11 +64,7 @@ async function carregarViagem() {
         seguranca,
         guia_nome,
         guia_whatsapp,
-        destinos (
-          nome,
-          pais,
-          imagem_capa_url
-        )
+        destino_id
       `)
       .eq("id", viagemId)
       .maybeSingle();
@@ -80,9 +75,24 @@ async function carregarViagem() {
       return;
     }
 
-    viagemData = viagem;
+    // 2) Buscar dados do destino (se houver destino_id)
+    let destinos = null;
+    if (viagem.destino_id) {
+      const { data: dest, error: erroDestino } = await supabase
+        .from("destinos")
+        .select("id, nome, pais, imagem_capa_url")
+        .eq("id", viagem.destino_id)
+        .maybeSingle();
+      if (!erroDestino && dest) {
+        destinos = dest;
+      } else if (erroDestino) {
+        console.warn("Erro ao buscar destino (não é crítico):", erroDestino);
+      }
+    }
 
-    // 2. Buscar roteiro dia a dia
+    viagemData = { ...viagem, destinos };
+
+    // 3) Buscar roteiro dia a dia
     const { data: dias, error: erroDias } = await supabase
       .from("roteiro_dias")
       .select("dia, titulo, descricao")
@@ -95,9 +105,9 @@ async function carregarViagem() {
 
     diasData = dias || [];
 
-    preencherBanner(viagem);
-    preencherRoteiro(dias || []);
-    preencherCards(viagem);
+    preencherBanner(viagemData);
+    preencherRoteiro(diasData);
+    preencherCards(viagemData);
 
   } catch (err) {
     console.error("Erro inesperado:", err);
@@ -105,9 +115,9 @@ async function carregarViagem() {
   }
 }
 
-// ========================================
-// PREENCHER BANNER
-// ========================================
+// ========================
+// Banner
+// ========================
 function preencherBanner(viagem) {
   nomeViagemEl.textContent = viagem.nome_viagem || "";
 
@@ -117,12 +127,16 @@ function preencherBanner(viagem) {
 
   if (viagem.destinos?.imagem_capa_url) {
     bannerEl.style.backgroundImage = `url(${viagem.destinos.imagem_capa_url})`;
+  } else {
+    // fallback sem imagem
+    bannerEl.style.backgroundImage =
+      "linear-gradient(135deg,#1f7a4d 0%,#273a59 50%,#4a5568 100%)";
   }
 }
 
-// ========================================
-// PREENCHER ROTEIRO DIA A DIA
-// ========================================
+// ========================
+// Roteiro dia a dia
+// ========================
 function preencherRoteiro(dias) {
   if (!dias.length) {
     roteiroDiasEl.innerHTML = "<p>Roteiro dia a dia não cadastrado.</p>";
@@ -142,14 +156,14 @@ function preencherRoteiro(dias) {
     .join("");
 }
 
-// ========================================
-// PREENCHER CARDS LATERAIS
-// ========================================
+// ========================
+// Cards laterais
+// ========================
 function preencherCards(viagem) {
-  // DICAS
+  // Dicas
   dicasEl.innerHTML = (viagem.dicas || "Sem dicas cadastradas.").replace(/\n/g, "<br>");
 
-  // CLIMA (com link para previsão do tempo)
+  // Clima + link clima
   if (viagem.clima) {
     const cidadeClima = viagem.destinos?.nome || "Londres";
     const paisClima = viagem.destinos?.pais || "Reino Unido";
@@ -166,15 +180,17 @@ function preencherCards(viagem) {
     climaEl.textContent = "Informação de clima não cadastrada.";
   }
 
-  // MAPA (link para Google Maps do destino)
+  // Mapa
   if (viagem.destinos?.nome) {
-    const query = encodeURIComponent(`${viagem.destinos.nome}, ${viagem.destinos.pais || ""}`);
+    const query = encodeURIComponent(
+      `${viagem.destinos.nome}, ${viagem.destinos.pais || ""}`
+    );
     linkMapaEl.href = `https://www.google.com/maps/search/?api=1&query=${query}`;
   } else {
     mapaEl.innerHTML = "Mapa não disponível.";
   }
 
-  // LINKS ÚTEIS
+  // Links úteis
   if (!viagem.links_uteis) {
     linksEl.innerHTML = "Nenhum link disponível.";
   } else {
@@ -201,12 +217,12 @@ function preencherCards(viagem) {
     }
   }
 
-  // CARDS ADICIONAIS: MOEDA, TOMADAS, SEGURANÇA
+  // Cards extras
   adicionarCardExtra(viagem.moeda, "💰 MOEDA");
   adicionarCardExtra(viagem.tomadas, "🔌 TOMADAS");
   adicionarCardExtra(viagem.seguranca, "🔒 SEGURANÇA");
 
-  // WHATSAPP DO GUIA
+  // WhatsApp do guia
   if (viagem.guia_whatsapp) {
     const numeroLimpo = viagem.guia_whatsapp.replace(/\D/g, "");
     const nomeGuia = viagem.guia_nome || "Guia";
@@ -224,18 +240,13 @@ function preencherCards(viagem) {
     cardsSidebar.insertBefore(cardWhatsapp, btnGerarPdf);
   }
 
-  // PDF
-  if (viagem.pdf_url) {
-    pdfLinkEl.href = viagem.pdf_url;
-    pdfLinkEl.style.display = "block";
-  } else {
-    pdfLinkEl.style.display = "none";
-  }
+  // Removemos o botão "ABRIR PDF COMPLETO" do JS:
+  // ele não será mais mostrado, só usamos o "GERAR PDF DO ROTEIRO".
 }
 
-// ========================================
-// ADICIONAR CARD EXTRA (MOEDA, TOMADAS, SEGURANÇA)
-// ========================================
+// ========================
+// Helper para cards extras
+// ========================
 function adicionarCardExtra(conteudo, titulo) {
   if (!conteudo) return;
 
@@ -248,61 +259,57 @@ function adicionarCardExtra(conteudo, titulo) {
   cardsSidebar.insertBefore(card, btnGerarPdf);
 }
 
-// ========================================
-// FORMATAR DATA (DD/MM/YYYY)
-// ========================================
+// ========================
+// Formatar data
+// ========================
 function formatarData(iso) {
   if (!iso) return "";
   const [y, m, d] = iso.split("-");
   return `${d}/${m}/${y}`;
 }
 
-// ========================================
-// GERAR PDF COM IMAGEM (BASE64)
-// ========================================
+// ========================
+// Gerar PDF com imagem
+// ========================
 btnGerarPdf.addEventListener("click", async () => {
   if (!viagemData || !diasData.length) {
     alert("Dados da viagem não carregados ainda.");
     return;
   }
 
-  // Mostrar mensagem de carregamento
   btnGerarPdf.textContent = "⏳ GERANDO PDF...";
   btnGerarPdf.disabled = true;
 
-  // Converter imagem para Base64 (se existir)
   let imagemBase64 = null;
   if (viagemData.destinos?.imagem_capa_url) {
     imagemBase64 = await urlToBase64(viagemData.destinos.imagem_capa_url);
   }
 
-  // Montar conteúdo do PDF
   const content = [];
 
-  // Adicionar imagem (se conseguiu converter)
   if (imagemBase64) {
     content.push({
       image: imagemBase64,
       width: 500,
       alignment: "center",
-      margin: [0, 0, 0, 20]
+      margin: [0, 0, 0, 20],
     });
   }
 
-  // Adicionar título e datas
   content.push(
     { text: viagemData.nome_viagem, style: "header", alignment: "center" },
-    { 
-      text: `${formatarData(viagemData.data_saida)} → ${formatarData(viagemData.data_retorno)}`, 
-      style: "subheader", 
-      alignment: "center" 
+    {
+      text: `${formatarData(viagemData.data_saida)} → ${formatarData(
+        viagemData.data_retorno
+      )}`,
+      style: "subheader",
+      alignment: "center",
     },
     { text: "\n" },
     { text: "ROTEIRO DIA A DIA", style: "sectionTitle" },
     { text: "\n" }
   );
 
-  // Adicionar dias
   diasData.forEach((d) => {
     content.push(
       { text: `DIA ${d.dia}: ${d.titulo}`, style: "diaTitle" },
@@ -311,30 +318,38 @@ btnGerarPdf.addEventListener("click", async () => {
     );
   });
 
-  // Definição do documento
   const docDefinition = {
-    content: content,
+    content,
     styles: {
       header: { fontSize: 20, bold: true, color: "#27ae60" },
       subheader: { fontSize: 14, italics: true, color: "#555" },
       sectionTitle: { fontSize: 16, bold: true, color: "#2c3e50" },
-      diaTitle: { fontSize: 13, bold: true, margin: [0, 10, 0, 5], color: "#34495e" },
-      diaDesc: { fontSize: 11, margin: [0, 0, 0, 10], alignment: "justify" }
+      diaTitle: {
+        fontSize: 13,
+        bold: true,
+        margin: [0, 10, 0, 5],
+        color: "#34495e",
+      },
+      diaDesc: {
+        fontSize: 11,
+        margin: [0, 0, 0, 10],
+        alignment: "justify",
+      },
     },
-    pageMargins: [40, 60, 40, 60]
+    pageMargins: [40, 60, 40, 60],
   };
 
-  // Gerar e baixar PDF
-  pdfMake.createPdf(docDefinition).download(`roteiro_${viagemData.nome_viagem.replace(/\s+/g, "_")}.pdf`);
+  pdfMake
+    .createPdf(docDefinition)
+    .download(`roteiro_${viagemData.nome_viagem.replace(/\s+/g, "_")}.pdf`);
 
-  // Restaurar botão
   setTimeout(() => {
     btnGerarPdf.textContent = "📄 GERAR PDF DO ROTEIRO";
     btnGerarPdf.disabled = false;
   }, 1000);
 });
 
-// ========================================
-// INICIALIZAR
-// ========================================
+// ========================
+// Start
+// ========================
 carregarViagem();
