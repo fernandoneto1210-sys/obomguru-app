@@ -111,12 +111,12 @@ function preencherCards(viagem) {
     const queryClima = encodeURIComponent(`${cidadeClima}, ${paisClima} weather`);
     const linkClima = `https://www.google.com/search?q=${queryClima}`;
 
-    climaEl.innerHTML = `
-      <p style="margin-bottom:8px;">${viagem.clima}</p>
-      <a href="${linkClima}" target="_blank" rel="noopener" style="font-size:0.88rem;">
-        🌤️ Ver previsão completa
-      </a>
-    `;
+   climaEl.innerHTML = `
+  <p style="margin-bottom:8px; color:#fff;">${viagem.clima}</p>
+  <a href="${linkClima}" target="_blank" rel="noopener" style="font-size:0.88rem;">
+    🌤️ Ver previsão completa
+  </a>
+`;
   } else {
     climaEl.textContent = "Informação de clima não cadastrada.";
   }
@@ -172,3 +172,4 @@ function formatarData(iso) {
 }
 
 carregarViagem();
+
