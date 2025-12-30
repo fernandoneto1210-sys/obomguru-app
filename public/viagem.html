@@ -4,7 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Roteiro da Viagem – ObomGuru</title>
-  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- pdfmake via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
   <style>
     * {
       margin: 0;
@@ -133,6 +137,7 @@
       font-size: 0.92rem;
       line-height: 1.6;
       opacity: 0.9;
+      color: #fff;
     }
     .card a {
       color: #fff;
@@ -152,7 +157,7 @@
       margin-bottom: 8px;
     }
 
-    /* BOTÃO PDF */
+    /* BOTÕES */
     .btn-pdf {
       display: block;
       width: 100%;
@@ -166,6 +171,8 @@
       font-size: 1rem;
       box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
       transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
     }
     .btn-pdf:hover {
       background: #229954;
@@ -231,7 +238,7 @@
       </div>
 
       <!-- COLUNA DIREITA: Cards -->
-      <div class="cards-sidebar">
+      <div class="cards-sidebar" id="cardsSidebar">
         <!-- DICAS -->
         <div class="card">
           <h3>💡 DICAS</h3>
@@ -260,7 +267,12 @@
           <div id="links">Carregando...</div>
         </div>
 
-        <!-- BOTÃO PDF -->
+        <!-- BOTÃO GERAR PDF -->
+        <button id="btnGerarPdf" class="btn-pdf">
+          📄 GERAR PDF DO ROTEIRO
+        </button>
+
+        <!-- BOTÃO PDF (se tiver pdf_url) -->
         <a id="pdfLink" class="btn-pdf" target="_blank" style="display:none;">
           📄 ABRIR PDF COMPLETO
         </a>
