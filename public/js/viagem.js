@@ -17,18 +17,18 @@ if (!viagemId) {
 async function carregarViagem() {
   console.log("🔎 Carregando viagem com id:", viagemId);
 
-  // 1. Buscar dados gerais da viagem
-  const { data: viagem, error: erroViagem } = await supabase
+  const { data: viagem, error } = await supabase
     .from("viagens")
     .select("*")
     .eq("id", viagemId)
     .single();
 
-  console.log("📦 Dados da viagem:", viagem);
+  console.log("📦 Dados da viagem recebidos:", viagem);
 
-  if (erroViagem || !viagem) {
-    console.error("❌ Erro ao buscar viagem:", erroViagem);
-    const erroEl = document.getElementById("erroViagem");
+  const erroEl = document.getElementById("erroViagem");
+
+  if (error || !viagem) {
+    console.error("❌ Erro ao buscar viagem:", error);
     if (erroEl) {
       erroEl.textContent = "Viagem não encontrada.";
       erroEl.style.display = "block";
@@ -36,102 +36,65 @@ async function carregarViagem() {
     return;
   }
 
-  // 2. Buscar roteiro dia a dia da tabela roteiro_dias
-  const { data: dias, error: erroDias } = await supabase
-    .from("roteiro_dias")
-    .select("*")
-    .eq("viagem_id", viagemId)
-    .order("numero_dia", { ascending: true });
-
-  console.log("📅 Dias do roteiro:", dias);
-
   // ===== TÍTULO =====
   const titulo = viagem.nome_viagem || "Viagem";
-  const tituloPage = document.getElementById("tituloViagem");
-  const tituloCapa = document.getElementById("tituloViagemCapa");
-
-  if (tituloPage) tituloPage.textContent = titulo;
-  if (tituloCapa) tituloCapa.textContent = titulo;
+  document.getElementById("tituloViagem").textContent = titulo;
+  document.getElementById("tituloViagemCapa").textContent = titulo;
 
   // ===== DATAS =====
   const datasEl = document.getElementById("datasViagem");
-  if (datasEl) {
-    if (viagem.data_saida && viagem.data_retorno) {
-      const saida = formatarData(viagem.data_saida);
-      const retorno = formatarData(viagem.data_retorno);
-      datasEl.textContent = `${saida} a ${retorno}`;
-    } else {
-      datasEl.textContent = "";
-    }
+  if (viagem.data_saida && viagem.data_retorno) {
+    const saida = formatarData(viagem.data_saida);
+    const retorno = formatarData(viagem.data_retorno);
+    datasEl.textContent = `${saida} a ${retorno}`;
+  } else {
+    datasEl.textContent = "";
   }
 
   // ===== IMAGEM DE CAPA =====
   const imgEl = document.getElementById("imgCapaViagem");
   if (imgEl) {
-    // Por enquanto usa imagem padrão
-    // Depois você pode adicionar coluna imagem_capa na tabela viagens
-    imgEl.src = "/img/logo.png"; // ou qualquer imagem padrão
+    // Usa a logo como capa padrão por enquanto
+    imgEl.src = "/img/logo.png";
     imgEl.alt = titulo;
   }
 
   // ===== ROTEIRO DIA A DIA =====
   const roteiroEl = document.getElementById("roteiroTexto");
-  if (roteiroEl) {
-    if (dias && dias.length > 0) {
-      // Montar o roteiro a partir da tabela roteiro_dias
-      const htmlRoteiro = dias
-        .map((dia) => {
-          return `
-            <div class="dia-roteiro">
-              <h3>${dia.numero_dia}° Dia ${dia.data_dia ? "- " + formatarData(dia.data_dia) : ""}</h3>
-              <p>${dia.descricao || ""}</p>
-            </div>
-          `;
-        })
-        .join("");
-      roteiroEl.innerHTML = htmlRoteiro;
-    } else if (viagem.roteiro_texto && viagem.roteiro_texto.trim().length > 0) {
-      // Fallback: se não tiver na tabela roteiro_dias, usa roteiro_texto
-      roteiroEl.innerHTML = viagem.roteiro_texto
-        .split("\n")
-        .filter((linha) => linha.trim().length > 0)
-        .map((linha) => `<p>${linha}</p>`)
-        .join("");
-    } else {
-      roteiroEl.innerHTML = "<p>Roteiro não disponível.</p>";
-    }
+  const textoRoteiro = viagem.roteiro_texto;
+
+  if (textoRoteiro && textoRoteiro.trim().length > 0) {
+    // Cada quebra de linha no banco vira um <p> na tela
+    roteiroEl.innerHTML = textoRoteiro
+      .split("\n")
+      .map(linha => linha.trim())
+      .filter(linha => linha.length > 0)
+      .map(linha => `<p>${linha}</p>`)
+      .join("");
+  } else {
+    console.warn("⚠️ roteiro_texto vazio ou nulo para esta viagem.");
+    roteiroEl.innerHTML = "<p>Roteiro não disponível.</p>";
   }
 
   // ===== DICAS =====
   const dicasEl = document.getElementById("dicasViagem");
   if (dicasEl) {
-    let blocos = [];
-
     if (viagem.dicas && viagem.dicas.trim().length > 0) {
-      blocos.push(
-        viagem.dicas
-          .split("\n")
-          .filter((l) => l.trim().length > 0)
-          .map((l) => `<p>${l}</p>`)
-          .join("")
-      );
-    }
-
-    if (viagem.informacoes_uteis && viagem.informacoes_uteis.trim().length > 0) {
-      blocos.push(
-        "<h3>Informações Úteis</h3>" +
-          viagem.informacoes_uteis
-            .split("\n")
-            .filter((l) => l.trim().length > 0)
-            .map((l) => `<p>${l}</p>`)
-            .join("")
-      );
-    }
-
-    if (blocos.length === 0) {
-      dicasEl.innerHTML = "<p>Dicas ainda não cadastradas.</p>";
+      dicasEl.innerHTML = viagem.dicas
+        .split("\n")
+        .map(l => l.trim())
+        .filter(l => l.length > 0)
+        .map(l => `<p>${l}</p>`)
+        .join("");
+    } else if (viagem.informacoes_uteis && viagem.informacoes_uteis.trim().length > 0) {
+      dicasEl.innerHTML = viagem.informacoes_uteis
+        .split("\n")
+        .map(l => l.trim())
+        .filter(l => l.length > 0)
+        .map(l => `<p>${l}</p>`)
+        .join("");
     } else {
-      dicasEl.innerHTML = blocos.join("");
+      dicasEl.innerHTML = "<p>Dicas ainda não cadastradas.</p>";
     }
   }
 
@@ -146,7 +109,7 @@ async function carregarViagem() {
     }
   }
 
-  // ===== WHATSAPP DO GUIA =====
+  // ===== WHATSAPP DO GUIA (SE TIVER) =====
   const linkWhats = document.querySelector('a[href*="wa.me"]');
   if (linkWhats && viagem.guia_whatsapp) {
     const numero = viagem.guia_whatsapp.replace(/\D/g, "");
@@ -159,14 +122,12 @@ async function carregarViagem() {
 function formatarData(valor) {
   if (!valor) return "";
   const d = new Date(valor + "T00:00:00");
-  if (isNaN(d.getTime())) {
-    return "";
-  }
+  if (isNaN(d.getTime())) return "";
   return d.toLocaleDateString("pt-BR");
 }
 
 // =======================
-// CHECKLIST
+// CHECKLIST (se você já tem no HTML)
 // =======================
 function salvarChecklist() {
   if (!viagemId) return;
@@ -191,13 +152,10 @@ document.querySelectorAll(".checklist-item").forEach((cb) => {
   cb.addEventListener("change", salvarChecklist);
 });
 
-// =======================
-// BOTÃO PDF CHECKLIST
-// =======================
 document
   .getElementById("btnGerarChecklistPdf")
   ?.addEventListener("click", () => {
-    alert("Função de gerar PDF do checklist será implementada.");
+    alert("Depois implementamos o PDF do checklist aqui.");
   });
 
 // =======================
