@@ -12,7 +12,7 @@ if (!viagemId) {
 }
 
 // =======================
-// CARREGAR VIAGEM (MESMA LÓGICA PARA TODOS OS DESTINOS)
+// CARREGAR VIAGEM
 // =======================
 async function carregarViagem() {
   console.log("🔎 Carregando viagem com id:", viagemId);
@@ -51,19 +51,7 @@ async function carregarViagem() {
     datasEl.textContent = `${saida} a ${retorno}`;
   }
 
-  // ===== IMAGEM DE CAPA (LOGO POR ENQUANTO) =====
-  const imgEl = document.getElementById("imgCapaViagem");
-  if (imgEl) {
-    if (viagem.imagem_capa) {
-  imgEl.src = viagem.imagem_capa;
-} else {
-  imgEl.src = "/img/default-capa.jpg";
-}
-;
-    imgEl.alt = titulo;
-  }
-
-  // ===== ROTEIRO DIA A DIA (USANDO roteiro_texto) =====
+  // ===== ROTEIRO DIA A DIA =====
   const roteiroEl = document.getElementById("roteiroTexto");
   if (roteiroEl) {
     const texto = viagem.roteiro_texto;
@@ -79,36 +67,32 @@ async function carregarViagem() {
     }
   }
 
-  // ===== DICAS / INFORMAÇÕES =====
+  // ===== DICAS =====
   const dicasEl = document.getElementById("dicasViagem");
   if (dicasEl) {
-    const blocos = [];
+    dicasEl.innerHTML = "";
 
     if (viagem.dicas && viagem.dicas.trim().length > 0) {
-      blocos.push(
-        viagem.dicas
-          .split("\n")
-          .map(l => l.trim())
-          .filter(l => l.length > 0)
-          .map(l => `<p>${l}</p>`)
-          .join("")
-      );
+      dicasEl.innerHTML += `
+        <div class="dica-box">
+          <h3>Informações Gerais</h3>
+          ${viagem.dicas.split("\n").filter(l => l.trim()).map(l => `<p>${l}</p>`).join("")}
+        </div>
+      `;
     }
 
     if (viagem.informacoes_uteis && viagem.informacoes_uteis.trim().length > 0) {
-      blocos.push(
-        "<h3>Informações Úteis</h3>" +
-          viagem.informacoes_uteis
-            .split("\n")
-            .map(l => l.trim())
-            .filter(l => l.length > 0)
-            .map(l => `<p>${l}</p>`)
-            .join("")
-      );
+      dicasEl.innerHTML += `
+        <div class="dica-box">
+          <h3>Informações Úteis</h3>
+          ${viagem.informacoes_uteis.split("\n").filter(l => l.trim()).map(l => `<p>${l}</p>`).join("")}
+        </div>
+      `;
     }
 
-    dicasEl.innerHTML =
-      blocos.length > 0 ? blocos.join("<hr>") : "<p>Dicas ainda não cadastradas.</p>";
+    if (!viagem.dicas && !viagem.informacoes_uteis) {
+      dicasEl.innerHTML = "<p>Nenhuma dica cadastrada.</p>";
+    }
   }
 
   // ===== PDF DO ROTEIRO =====
@@ -122,7 +106,7 @@ async function carregarViagem() {
     }
   }
 
-  // ===== WHATSAPP GUIA (SE TIVER) =====
+  // ===== WHATSAPP GUIA =====
   const linkWhats = document.querySelector('a[href*="wa.me"]');
   if (linkWhats && viagem.guia_whatsapp) {
     const numero = viagem.guia_whatsapp.replace(/\D/g, "");
@@ -138,7 +122,7 @@ function formatarData(valor) {
 }
 
 // =======================
-// CHECKLIST (LOCALSTORAGE POR VIAGEM)
+// CHECKLIST
 // =======================
 function salvarChecklist() {
   if (!viagemId) return;
@@ -166,7 +150,7 @@ document.querySelectorAll(".checklist-item").forEach(cb => {
 document
   .getElementById("btnGerarChecklistPdf")
   ?.addEventListener("click", () => {
-    alert("PDF do checklist será implementado depois.");
+    alert("Função de gerar PDF do checklist será implementada.");
   });
 
 document
@@ -176,6 +160,6 @@ document
     window.location.href = "/login.html";
   });
 
+// =======================
 carregarViagem();
 carregarChecklist();
-
