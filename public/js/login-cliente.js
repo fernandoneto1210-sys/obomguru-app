@@ -41,22 +41,26 @@ if (form) {
 
     console.log("✅ LOGIN OK:", data.user.email);
 
-    // Buscar tipo de usuário
+    // Buscar tipo de usuário e viagem vinculada
     const { data: usuario } = await supabase
       .from("usuarios")
-      .select("tipo, auth_id")
+      .select("tipo, auth_id, viagem_id")
       .eq("email", email)
       .maybeSingle();
 
-    // Se não existir na tabela, criar como cliente
+    // Se não existir na tabela, criar como cliente sem viagem
     if (!usuario) {
       await supabase.from("usuarios").insert({
         email,
         nome: email.split("@")[0],
         tipo: "cliente",
         auth_id: data.user.id,
+        viagem_id: null,
       });
-      window.location.href = "/minha-area.html";
+      erroEl.textContent = "Usuário criado! Entre em contato com o administrador para vincular sua viagem.";
+      erroEl.style.display = "block";
+      btnLogin.disabled = false;
+      btnLogin.textContent = "Entrar";
       return;
     }
 
@@ -71,8 +75,15 @@ if (form) {
     // Redirecionar conforme tipo
     if (usuario.tipo === "admin") {
       window.location.href = "/admin/viagens.html";
+    } else if (usuario.viagem_id) {
+      // Cliente com viagem vinculada → vai para a página da viagem
+      window.location.href = `/viagem.html?id=${usuario.viagem_id}`;
     } else {
-      window.location.href = "/minha-area.html";
+      // Cliente sem viagem vinculada
+      erroEl.textContent = "Você ainda não está vinculado a nenhuma viagem. Entre em contato com o administrador.";
+      erroEl.style.display = "block";
+      btnLogin.disabled = false;
+      btnLogin.textContent = "Entrar";
     }
   });
 }
