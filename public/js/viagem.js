@@ -19,6 +19,28 @@ const cardsSidebar  = document.getElementById("cardsSidebar");
 let viagemData = null;
 let diasData = [];
 
+// ========================================
+// HELPER: Converter URL de imagem para Base64
+// ========================================
+async function urlToBase64(url) {
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch (error) {
+    console.error("Erro ao converter imagem para Base64:", error);
+    return null;
+  }
+}
+
+// ========================================
+// CARREGAR VIAGEM
+// ========================================
 async function carregarViagem() {
   if (!viagemId) {
     nomeViagemEl.textContent = "Viagem não encontrada (sem ID na URL)";
@@ -83,6 +105,9 @@ async function carregarViagem() {
   }
 }
 
+// ========================================
+// PREENCHER BANNER
+// ========================================
 function preencherBanner(viagem) {
   nomeViagemEl.textContent = viagem.nome_viagem || "";
 
@@ -95,6 +120,9 @@ function preencherBanner(viagem) {
   }
 }
 
+// ========================================
+// PREENCHER ROTEIRO DIA A DIA
+// ========================================
 function preencherRoteiro(dias) {
   if (!dias.length) {
     roteiroDiasEl.innerHTML = "<p>Roteiro dia a dia não cadastrado.</p>";
@@ -114,6 +142,9 @@ function preencherRoteiro(dias) {
     .join("");
 }
 
+// ========================================
+// PREENCHER CARDS LATERAIS
+// ========================================
 function preencherCards(viagem) {
   // DICAS
   dicasEl.innerHTML = (viagem.dicas || "Sem dicas cadastradas.").replace(/\n/g, "<br>");
@@ -202,6 +233,9 @@ function preencherCards(viagem) {
   }
 }
 
+// ========================================
+// ADICIONAR CARD EXTRA (MOEDA, TOMADAS, SEGURANÇA)
+// ========================================
 function adicionarCardExtra(conteudo, titulo) {
   if (!conteudo) return;
 
@@ -214,36 +248,72 @@ function adicionarCardExtra(conteudo, titulo) {
   cardsSidebar.insertBefore(card, btnGerarPdf);
 }
 
+// ========================================
+// FORMATAR DATA (DD/MM/YYYY)
+// ========================================
 function formatarData(iso) {
   if (!iso) return "";
   const [y, m, d] = iso.split("-");
   return `${d}/${m}/${y}`;
 }
 
-// GERAR PDF
-btnGerarPdf.addEventListener("click", () => {
+// ========================================
+// GERAR PDF COM IMAGEM (BASE64)
+// ========================================
+btnGerarPdf.addEventListener("click", async () => {
   if (!viagemData || !diasData.length) {
     alert("Dados da viagem não carregados ainda.");
     return;
   }
 
+  // Mostrar mensagem de carregamento
+  btnGerarPdf.textContent = "⏳ GERANDO PDF...";
+  btnGerarPdf.disabled = true;
+
+  // Converter imagem para Base64 (se existir)
+  let imagemBase64 = null;
+  if (viagemData.destinos?.imagem_capa_url) {
+    imagemBase64 = await urlToBase64(viagemData.destinos.imagem_capa_url);
+  }
+
+  // Montar conteúdo do PDF
+  const content = [];
+
+  // Adicionar imagem (se conseguiu converter)
+  if (imagemBase64) {
+    content.push({
+      image: imagemBase64,
+      width: 500,
+      alignment: "center",
+      margin: [0, 0, 0, 20]
+    });
+  }
+
+  // Adicionar título e datas
+  content.push(
+    { text: viagemData.nome_viagem, style: "header", alignment: "center" },
+    { 
+      text: `${formatarData(viagemData.data_saida)} → ${formatarData(viagemData.data_retorno)}`, 
+      style: "subheader", 
+      alignment: "center" 
+    },
+    { text: "\n" },
+    { text: "ROTEIRO DIA A DIA", style: "sectionTitle" },
+    { text: "\n" }
+  );
+
+  // Adicionar dias
+  diasData.forEach((d) => {
+    content.push(
+      { text: `DIA ${d.dia}: ${d.titulo}`, style: "diaTitle" },
+      { text: d.descricao || "", style: "diaDesc" },
+      { text: "\n" }
+    );
+  });
+
+  // Definição do documento
   const docDefinition = {
-    content: [
-      { text: viagemData.nome_viagem, style: "header", alignment: "center" },
-      { 
-        text: `${formatarData(viagemData.data_saida)} → ${formatarData(viagemData.data_retorno)}`, 
-        style: "subheader", 
-        alignment: "center" 
-      },
-      { text: "\n" },
-      { text: "ROTEIRO DIA A DIA", style: "sectionTitle" },
-      { text: "\n" },
-      ...diasData.map((d) => [
-        { text: `DIA ${d.dia}: ${d.titulo}`, style: "diaTitle" },
-        { text: d.descricao || "", style: "diaDesc" },
-        { text: "\n" }
-      ]).flat()
-    ],
+    content: content,
     styles: {
       header: { fontSize: 20, bold: true, color: "#27ae60" },
       subheader: { fontSize: 14, italics: true, color: "#555" },
@@ -254,7 +324,17 @@ btnGerarPdf.addEventListener("click", () => {
     pageMargins: [40, 60, 40, 60]
   };
 
+  // Gerar e baixar PDF
   pdfMake.createPdf(docDefinition).download(`roteiro_${viagemData.nome_viagem.replace(/\s+/g, "_")}.pdf`);
+
+  // Restaurar botão
+  setTimeout(() => {
+    btnGerarPdf.textContent = "📄 GERAR PDF DO ROTEIRO";
+    btnGerarPdf.disabled = false;
+  }, 1000);
 });
 
+// ========================================
+// INICIALIZAR
+// ========================================
 carregarViagem();
