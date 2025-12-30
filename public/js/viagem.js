@@ -181,7 +181,6 @@ document
   ?.addEventListener("click", () => {
     alert("Função de gerar PDF do checklist será implementada.");
   });
-
 document
   .getElementById("btnSairViagem")
   ?.addEventListener("click", async () => {
@@ -192,4 +191,5 @@ document
 // =======================
 carregarViagem();
 carregarChecklist();
+
 
