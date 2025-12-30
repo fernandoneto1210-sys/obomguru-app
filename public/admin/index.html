@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login – ObomGuru</title>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="login-page">
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h1>🔐 ADMIN</h1>
+        <p>Painel Administrativo ObomGuru</p>
+      </div>
+
+      <form id="formLogin" class="login-form">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input 
+            type="email" 
+            id="email" 
+            placeholder="seu@email.com" 
+            required 
+            autocomplete="email"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="password">Senha</label>
+          <input 
+            type="password" 
+            id="password" 
+            placeholder="••••••••" 
+            required 
+            autocomplete="current-password"
+          >
+        </div>
+
+        <div id="erro" class="erro-msg" style="display:none;"></div>
+
+        <button type="submit" class="btn-primary" id="btnLogin">
+          ENTRAR
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="../js/admin/login.js"></script>
+</body>
+</html>
