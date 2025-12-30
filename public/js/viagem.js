@@ -104,8 +104,22 @@ function preencherCards(viagem) {
   // DICAS
   dicasEl.innerHTML = (viagem.dicas || "Sem dicas cadastradas.").replace(/\n/g, "<br>");
 
-  // CLIMA
-  climaEl.textContent = viagem.clima || "Informação de clima não cadastrada.";
+  // CLIMA (com link para previsão do tempo)
+  if (viagem.clima) {
+    const cidadeClima = viagem.destinos?.nome || "Londres"; // fallback
+    const paisClima = viagem.destinos?.pais || "Reino Unido";
+    const queryClima = encodeURIComponent(`${cidadeClima}, ${paisClima} weather`);
+    const linkClima = `https://www.google.com/search?q=${queryClima}`;
+
+    climaEl.innerHTML = `
+      <p style="margin-bottom:8px;">${viagem.clima}</p>
+      <a href="${linkClima}" target="_blank" rel="noopener" style="font-size:0.88rem;">
+        🌤️ Ver previsão completa
+      </a>
+    `;
+  } else {
+    climaEl.textContent = "Informação de clima não cadastrada.";
+  }
 
   // MAPA (link para Google Maps do destino)
   if (viagem.destinos?.nome) {
