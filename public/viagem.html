@@ -1,288 +1,126 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Roteiro da Viagem – ObomGuru</title>
-
-  <!-- pdfmake via CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body <header class="top-logo-bar">
-  <div class="top-logo-wrap">
-    <img src="img/logo.png" alt="Logo da agência" class="top-logo-img">
-  </div>
-</header>
- {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background: #f0f2f5;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      background: #fff;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-    }
-
-    /* BANNER TOPO */
-    .banner {
-      width: 100%;
-      height: 280px;
-      background-size: cover;
-      background-position: center;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 30px;
-      color: #fff;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
-    }
-    .banner::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.7));
-    }
-    .banner-content {
-      position: relative;
-      z-index: 1;
-    }
-    .banner h1 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-      letter-spacing: 1px;
-    }
-    .banner .datas {
-      font-size: 1.1rem;
-      font-weight: 500;
-      opacity: 0.95;
-    }
-
-    /* CONTEÚDO */
-    .content {
-      display: grid;
-      grid-template-columns: 1.6fr 1fr;
-      gap: 24px;
-      padding: 32px;
-    }
-
-    /* ROTEIRO DIA A DIA */
-    .section-roteiro {
-      background: #fafbfc;
-      border-radius: 16px;
-      padding: 24px;
-    }
-    .section-roteiro h2 {
-      font-size: 1.4rem;
-      color: #2c3e50;
-      margin-bottom: 18px;
-      font-weight: 700;
-      border-bottom: 3px solid #27ae60;
-      padding-bottom: 10px;
-    }
-    .dia-item {
-      margin-bottom: 18px;
-      padding-bottom: 14px;
-      border-bottom: 1px solid #e1e8ed;
-    }
-    .dia-item:last-child {
-      border-bottom: none;
-    }
-    .dia-titulo {
-      font-weight: 700;
-      color: #34495e;
-      font-size: 1.02rem;
-      margin-bottom: 6px;
-    }
-    .dia-descricao {
-      color: #5a6c7d;
-      line-height: 1.6;
-      font-size: 0.94rem;
-    }
-
-    /* CARDS LATERAIS */
-    .cards-sidebar {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .card {
-      background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
-      color: #fff;
-      border-radius: 14px;
-      padding: 18px 20px;
-      box-shadow: 0 4px 12px rgba(52, 73, 94, 0.3);
-    }
-    .card h3 {
-      font-size: 1.05rem;
-      margin-bottom: 12px;
-      font-weight: 600;
-      opacity: 0.95;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .card p, .card div {
-      font-size: 0.92rem;
-      line-height: 1.6;
-      opacity: 0.9;
-      color: #fff;
-    }
-    .card a {
-      color: #fff;
-      text-decoration: none;
-      font-weight: 500;
-      border-bottom: 1px solid rgba(255,255,255,0.4);
-      transition: all 0.2s ease;
-      display: inline-block;
-      margin-top: 4px;
-    }
-    .card a:hover {
-      border-bottom-color: #fff;
-      opacity: 1;
-    }
-    .card-link {
-      display: block;
-      margin-bottom: 8px;
-    }
-
-    /* BOTÕES */
-    .btn-pdf {
-      display: block;
-      width: 100%;
-      text-align: center;
-      background: #27ae60;
-      color: #fff;
-      padding: 16px 0;
-      border-radius: 12px;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 1rem;
-      box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
-      transition: all 0.3s ease;
-      border: none;
-      cursor: pointer;
-    }
-    .btn-pdf:hover {
-      background: #229954;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(39, 174, 96, 0.5);
-    }
-
-    /* RESPONSIVO MOBILE */
-    @media (max-width: 768px) {
-      body {
-        padding: 0;
-        background: #fff;
-      }
-      .container {
-        border-radius: 0;
-        box-shadow: none;
-      }
-      .banner {
-        height: 220px;
-        padding: 20px;
-      }
-      .banner h1 {
-        font-size: 1.7rem;
-      }
-      .banner .datas {
-        font-size: 0.95rem;
-      }
-      .content {
-        grid-template-columns: 1fr;
-        padding: 20px 16px;
-        gap: 20px;
-      }
-      .section-roteiro {
-        padding: 18px;
-      }
-      .section-roteiro h2 {
-        font-size: 1.2rem;
-      }
-      .dia-titulo {
-        font-size: 0.96rem;
-      }
-      .dia-descricao {
-        font-size: 0.88rem;
-      }
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="tituloViagem">Viagem | O Bom Guru</title>
+  <link rel="stylesheet" href="/css/viagem.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
-  <div class="container">
-    <!-- BANNER TOPO -->
-    <div id="banner" class="banner">
-      <div class="banner-content">
-        <h1 id="nomeViagem">Carregando...</h1>
-        <p class="datas" id="datas"></p>
-      </div>
+  <header class="viagem-header">
+    <div class="container">
+      <h1>🌍 O Bom Guru</h1>
+      <button id="btnSairViagem" class="btn-sair">Sair</button>
     </div>
+  </header>
 
-    <div class="content">
-      <!-- COLUNA ESQUERDA: Roteiro dia a dia -->
-      <div class="section-roteiro">
-        <h2>📅 ROTEIRO DIA A DIA</h2>
-        <div id="roteiroDias">Carregando roteiro...</div>
+  <main class="viagem-main">
+    <div id="erroViagem" class="error-msg"></div>
+
+    <!-- Capa da Viagem -->
+    <section class="viagem-capa">
+      <img id="imgCapaViagem" src="" alt="Capa da viagem">
+      <div class="capa-overlay">
+        <h1 id="tituloViagemCapa"></h1>
+        <p id="datasViagem"></p>
       </div>
+    </section>
 
-      <!-- COLUNA DIREITA: Cards -->
-      <div class="cards-sidebar" id="cardsSidebar">
-        <!-- DICAS -->
-        <div class="card">
-          <h3>💡 DICAS</h3>
-          <div id="dicas">Carregando...</div>
-        </div>
+    <div class="container">
+      <!-- Roteiro Detalhado -->
+      <section class="roteiro-section">
+        <h2>📅 Roteiro Dia a Dia</h2>
+        <div id="roteiroTexto" class="roteiro-content"></div>
+        <button id="btnGerarPdfRoteiro" class="btn btn-primary">📄 Gerar PDF do Roteiro</button>
+      </section>
 
-        <!-- CLIMA -->
-        <div class="card">
-          <h3>🌡️ CLIMA</h3>
-          <div id="clima">Carregando...</div>
-        </div>
+      <!-- CHECKLIST DA VIAGEM -->
+      <section class="checklist-section">
+        <h2>✅ Checklist da Viagem</h2>
+        <p class="checklist-intro">Marque os itens conforme for preparando sua viagem e gere um PDF para acompanhar!</p>
 
-        <!-- MAPA -->
-        <div class="card">
-          <h3>🗺️ MAPA</h3>
-          <div id="mapa">
-            <a href="#" id="linkMapa" target="_blank" rel="noopener">
-              📍 Ver no Google Maps
-            </a>
+        <div class="checklist-grid">
+          <div class="checklist-card">
+            <h3>📄 Documentação</h3>
+            <label><input type="checkbox" class="checklist-item" data-item="passaporte"> Passaporte válido (mínimo 6 meses)</label>
+            <label><input type="checkbox" class="checklist-item" data-item="visto"> Visto (se necessário)</label>
+            <label><input type="checkbox" class="checklist-item" data-item="seguro"> Seguro viagem contratado</label>
+            <label><input type="checkbox" class="checklist-item" data-item="carteira"> Carteira de motorista internacional</label>
+            <label><input type="checkbox" class="checklist-item" data-item="comprovantes"> Comprovantes de reservas</label>
+          </div>
+
+          <div class="checklist-card">
+            <h3>💉 Saúde</h3>
+            <label><input type="checkbox" class="checklist-item" data-item="vacinas"> Vacinas em dia</label>
+            <label><input type="checkbox" class="checklist-item" data-item="remedios"> Remédios de uso contínuo</label>
+            <label><input type="checkbox" class="checklist-item" data-item="receitas"> Receitas médicas</label>
+            <label><input type="checkbox" class="checklist-item" data-item="kit"> Kit de primeiros socorros</label>
+          </div>
+
+          <div class="checklist-card">
+            <h3>🎒 Bagagem</h3>
+            <label><input type="checkbox" class="checklist-item" data-item="roupas"> Roupas adequadas ao clima</label>
+            <label><input type="checkbox" class="checklist-item" data-item="calcados"> Calçados confortáveis</label>
+            <label><input type="checkbox" class="checklist-item" data-item="adaptador"> Adaptador de tomada</label>
+            <label><input type="checkbox" class="checklist-item" data-item="carregadores"> Carregadores e cabos</label>
+            <label><input type="checkbox" class="checklist-item" data-item="higiene"> Itens de higiene pessoal</label>
+          </div>
+
+          <div class="checklist-card">
+            <h3>💳 Financeiro</h3>
+            <label><input type="checkbox" class="checklist-item" data-item="cartao"> Cartão de crédito internacional</label>
+            <label><input type="checkbox" class="checklist-item" data-item="moeda"> Moeda local</label>
+            <label><input type="checkbox" class="checklist-item" data-item="banco"> Avisar banco sobre viagem</label>
+            <label><input type="checkbox" class="checklist-item" data-item="limite"> Verificar limite do cartão</label>
           </div>
         </div>
 
-        <!-- LINKS ÚTEIS -->
-        <div class="card">
-          <h3>🔗 LINKS ÚTEIS</h3>
-          <div id="links">Carregando...</div>
+        <div class="checklist-progress">
+          <p>Progresso: <strong id="checklistProgress">0/20</strong> itens concluídos</p>
+          <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+          </div>
         </div>
 
-        <!-- BOTÃO GERAR PDF -->
-        <button id="btnGerarPdf" class="btn-pdf">
-          📄 GERAR PDF DO ROTEIRO
-        </button>
+        <button id="btnGerarChecklistPdf" class="btn btn-success">📄 Gerar PDF do Checklist</button>
+      </section>
 
+      <!-- Dicas e Informações -->
+      <section class="dicas-section">
+        <h2>💡 Dicas e Informações Úteis</h2>
+        <div id="dicasViagem" class="dicas-content"></div>
+      </section>
+
+      <!-- Cards Úteis -->
+      <section class="cards-section">
+        <div class="cards-grid">
+          <div class="info-card">
+            <h3>🌡️ Clima</h3>
+            <p>Consulte a previsão do tempo para se preparar melhor!</p>
+            <a href="https://www.weather.com" target="_blank" class="btn btn-secondary">Ver Clima</a>
+          </div>
+
+          <div class="info-card">
+            <h3>🗺️ Mapas</h3>
+            <p>Explore os destinos e planeje seus passeios.</p>
+            <a href="https://www.google.com/maps" target="_blank" class="btn btn-secondary">Abrir Mapas</a>
+          </div>
+
+          <div class="info-card">
+            <h3>📞 Contato</h3>
+            <p>Tire suas dúvidas diretamente com a gente!</p>
+            <a href="https://wa.me/5535999999999" target="_blank" class="btn btn-secondary">WhatsApp</a>
+          </div>
         </div>
+      </section>
     </div>
-  </div>
+  </main>
 
-  <script type="module" src="js/viagem.js"></script>
+  <footer class="viagem-footer">
+    <p>&copy; 2025 O Bom Guru - Agência de Viagens</p>
+  </footer>
+
+  <script type="module" src="/js/viagem.js"></script>
 </body>
 </html>
-
-
