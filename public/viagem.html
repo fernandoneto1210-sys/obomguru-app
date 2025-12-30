@@ -3,119 +3,128 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Detalhes da Viagem – ObomGuru</title>
+  <title>Detalhes da Viagem</title>
   <link rel="stylesheet" href="css/style.css" />
   <style>
-    .banner {
-      width: 100%;
-      height: 220px;
-      background-size: cover;
-      background-position: center;
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
     .conteudo {
-      max-width: 900px;
+      max-width: 960px;
       margin: 0 auto;
       padding: 16px;
     }
+    .banner {
+      width: 100%;
+      height: 260px;
+      border-radius: 18px;
+      background-size: cover;
+      background-position: center;
+      margin-bottom: 20px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      text-align: center;
+    }
+    .subtitulo {
+      text-align: center;
+      color: #555;
+      margin-bottom: 24px;
+    }
     .info-bloco {
-      background: #fff;
-      padding: 16px 18px;
-      margin-top: 18px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 18px 20px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      margin-bottom: 18px;
     }
-    .info-bloco h3 {
-      margin: 0 0 10px;
-      color: #2d5016;
+    .info-bloco h2 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+      color: #1f3b73;
     }
-    .dia-item {
-      border-bottom: 1px solid #eee;
-      padding: 10px 0;
+    .dias-lista .dia-item {
+      margin-bottom: 10px;
     }
-    .dia-item:last-child { border-bottom: none; }
     .dia-titulo {
       font-weight: 600;
-      margin-bottom: 4px;
-      color: #2d5016;
+      color: #1f3b73;
     }
     .dia-descricao {
       font-size: 0.95rem;
       color: #444;
-      line-height: 1.5;
     }
-    .cards-infos {
+    .cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 14px;
+      gap: 12px;
     }
-    .card-info {
-      background: #f7faf5;
-      border-radius: 8px;
+    .card {
+      background: #f3f8ff;
+      border-radius: 12px;
       padding: 10px 12px;
-      border: 1px solid #e2e8d8;
-      font-size: 0.95rem;
+      font-size: 0.94rem;
     }
-    .card-info h4 {
+    .card h3 {
       margin: 0 0 6px;
-      font-size: 0.98rem;
-      color: #2d5016;
+      font-size: 0.95rem;
+      color: #1f3b73;
     }
     .btn-pdf {
       display: inline-block;
-      background: #2d5016;
+      width: 100%;
+      text-align: center;
+      background: #006bff;
       color: #fff;
-      padding: 10px 16px;
-      border-radius: 8px;
+      border-radius: 999px;
+      padding: 12px 0;
+      margin-top: 14px;
       text-decoration: none;
-      margin-top: 12px;
-      font-size: 0.95rem;
+      font-size: 0.96rem;
+      font-weight: 600;
+    }
+    @media (max-width: 600px) {
+      .banner { height: 200px; border-radius: 0; }
+      .info-bloco { border-radius: 12px; padding: 14px 16px; }
     }
   </style>
 </head>
 <body>
+  <div class="conteudo">
+    <div id="banner" class="banner"></div>
+    <h1 id="nomeViagem"></h1>
+    <p class="subtitulo"><span id="datas"></span></p>
 
-<header class="header">
-  <img src="img/logo.png" class="logo" />
-</header>
+    <div class="info-bloco">
+      <h2>Roteiro dia a dia</h2>
+      <div id="roteiroDias" class="dias-lista"></div>
+    </div>
 
-<div class="conteudo">
-  <div id="banner" class="banner"></div>
-
-  <h2 id="nomeViagem"></h2>
-  <p id="destino"></p>
-  <p><strong>Datas:</strong> <span id="datas"></span></p>
-
-  <!-- Roteiro dia a dia -->
-  <div class="info-bloco">
-    <h3>Roteiro dia a dia</h3>
-    <!-- opcional: um parágrafo de resumo -->
-    <p id="descricao"></p>
-    <div id="roteiroDias"></div>
-  </div>
-
-  <!-- Cards de informações -->
-  <div class="info-bloco">
-    <h3>Informações úteis</h3>
-    <div class="cards-infos">
-      <div class="card-info">
-        <h4>Dicas gerais</h4>
-        <p id="dicas"></p>
+    <div class="info-bloco">
+      <div class="cards-grid">
+        <div class="card">
+          <h3>Dicas</h3>
+          <div id="dicas"></div>
+        </div>
+        <div class="card">
+          <h3>Clima (Setembro)</h3>
+          <div id="clima"></div>
+        </div>
+        <div class="card">
+          <h3>Mapa</h3>
+          <div id="mapa">
+            <p>Em breve mapa interativo aqui.</p>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Links úteis</h3>
+          <div id="links"></div>
+        </div>
       </div>
-      <div class="card-info">
-        <h4>Links & Mapas</h4>
-        <div id="links"></div>
-      </div>
-      <div class="card-info">
-        <h4>Roteiro em PDF</h4>
-        <p>Veja o roteiro completo em PDF.</p>
-        <a id="pdfLink" class="btn-pdf" target="_blank">Abrir PDF</a>
-      </div>
+      <a id="pdfLink" class="btn-pdf" target="_blank" style="display:none;">
+        Abrir PDF completo
+      </a>
     </div>
   </div>
-</div>
 
-<script type="module" src="js/viagem.js"></script>
+  <script type="module" src="js/viagem.js"></script>
 </body>
 </html>
