@@ -8,10 +8,7 @@ if (!viagemId) {
   if (erroEl) {
     erroEl.textContent = "ID da viagem não informado.";
     erroEl.style.display = "block";
-  }
-}
 
-// =======================
 // CARREGAR VIAGEM
 // =======================
 async function carregarViagem() {
@@ -39,7 +36,7 @@ async function carregarViagem() {
   }
 
   // ===== TÍTULO =====
-  const titulo = data.titulo || "Viagem";
+  const titulo = data.nome_viagem || "Viagem";
   const tituloPage = document.getElementById("tituloViagem");
   const tituloCapa = document.getElementById("tituloViagemCapa");
 
@@ -49,39 +46,40 @@ async function carregarViagem() {
   // ===== DATAS =====
   const datasEl = document.getElementById("datasViagem");
   if (datasEl) {
-    if (data.data_inicio && data.data_fim) {
-      datasEl.textContent =
-        formatarData(data.data_inicio) + " a " + formatarData(data.data_fim);
+    if (data.data_saida && data.data_retorno) {
+      const saida = formatarData(data.data_saida);
+      const retorno = formatarData(data.data_retorno);
+      datasEl.textContent = `${saida} a ${retorno}`;
     } else {
-      console.warn("⚠️ data_inicio ou data_fim não vieram do banco:", {
-        data_inicio: data.data_inicio,
-        data_fim: data.data_fim,
-      });
+      console.warn("⚠️ Datas não encontradas");
       datasEl.textContent = "";
     }
   }
 
   // ===== IMAGEM DE CAPA =====
+  // Você ainda não tem campo de imagem na tabela
+  // Vamos usar uma imagem padrão por enquanto
   const imgEl = document.getElementById("imgCapaViagem");
   if (imgEl) {
-    if (data.imagem_capa) {
-      imgEl.src = data.imagem_capa;
-    } else {
-      console.warn("⚠️ imagem_capa não veio do banco. Usando imagem padrão.");
-      imgEl.src = "/img/default-viagem.jpg";
-    }
+    // Você pode adicionar um campo "imagem_capa" depois
+    imgEl.src = "/img/default-viagem.jpg";
+    imgEl.alt = titulo;
   }
 
-  // ===== ROTEIRO =====
+  // ===== ROTEIRO DIA A DIA =====
   const roteiroEl = document.getElementById("roteiroTexto");
   if (roteiroEl) {
-    if (data.roteiro && data.roteiro.trim().length > 0) {
-      roteiroEl.innerHTML = data.roteiro
+    const roteiro = data.roteiro_texto;
+
+    if (roteiro && roteiro.trim().length > 0) {
+      // Formatar o roteiro linha por linha
+      roteiroEl.innerHTML = roteiro
         .split("\n")
+        .filter(linha => linha.trim().length > 0)
         .map((linha) => `<p>${linha}</p>`)
         .join("");
     } else {
-      console.warn("⚠️ roteiro vazio ou ausente na viagem.");
+      console.warn("⚠️ roteiro_texto vazio ou ausente");
       roteiroEl.innerHTML = "<p>Roteiro não disponível.</p>";
     }
   }
@@ -89,30 +87,56 @@ async function carregarViagem() {
   // ===== DICAS =====
   const dicasEl = document.getElementById("dicasViagem");
   if (dicasEl) {
-    if (data.dicas && data.dicas.trim().length > 0) {
-      dicasEl.innerHTML = data.dicas
+    const dicas = data.dicas;
+
+    if (dicas && dicas.trim().length > 0) {
+      dicasEl.innerHTML = dicas
         .split("\n")
+        .filter(linha => linha.trim().length > 0)
         .map((linha) => `<p>${linha}</p>`)
         .join("");
     } else {
-      dicasEl.innerHTML = "<p>Sem dicas no momento.</p>";
+      dicasEl.innerHTML = "<p>Dicas ainda não cadastradas.</p>";
     }
+  }
+
+  // ===== BOTÃO PDF DO ROTEIRO =====
+  const btnPdf = document.getElementById("btnGerarPdfRoteiro");
+  if (btnPdf && data.pdf_url) {
+    btnPdf.textContent = "📄 Baixar PDF do Roteiro";
+    btnPdf.onclick = () => {
+      window.open(data.pdf_url, "_blank");
+    };
+  }
+
+  // ===== WHATSAPP DO GUIA =====
+  const linkWhatsApp = document.querySelector('a[href*="wa.me"]');
+  if (linkWhatsApp && data.guia_whatsapp) {
+    // Remove caracteres não numéricos
+    const numero = data.guia_whatsapp.replace(/\D/g, "");
+    linkWhatsApp.href = `https://wa.me/${numero}`;
+  }
+
+  // ===== LINK DO CLIMA (se tiver mapa_url ou clima específico) =====
+  const linkClima = document.getElementById("linkClima");
+  if (linkClima && data.clima) {
+    // Você pode personalizar depois
+    linkClima.href = `https://www.weather.com`;
   }
 }
 
 function formatarData(valor) {
-  // Supabase geralmente manda como "2026-05-21" (string)
   if (!valor) return "";
-  const d = new Date(valor);
+  const d = new Date(valor + "T00:00:00"); // Força timezone local
   if (isNaN(d.getTime())) {
-    console.warn("⚠️ Data inválida recebida:", valor);
+    console.warn("⚠️ Data inválida:", valor);
     return "";
   }
   return d.toLocaleDateString("pt-BR");
 }
 
 // =======================
-// CHECKLIST (ainda simples)
+// CHECKLIST
 // =======================
 function salvarChecklist() {
   if (!viagemId) return;
@@ -139,12 +163,12 @@ document.querySelectorAll(".checklist-item").forEach((cb) => {
 });
 
 // =======================
-// BOTÃO PDF CHECKLIST (placeholder)
+// BOTÃO PDF CHECKLIST
 // =======================
 document
   .getElementById("btnGerarChecklistPdf")
   ?.addEventListener("click", () => {
-    alert("Aqui vamos gerar o PDF do checklist.");
+    alert("Função de gerar PDF do checklist será implementada aqui.");
   });
 
 // =======================
@@ -157,6 +181,8 @@ document
     window.location.href = "/login.html";
   });
 
+// =======================
+// INICIALIZAR
 // =======================
 carregarViagem();
 carregarChecklist();
