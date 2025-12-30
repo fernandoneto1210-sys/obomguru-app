@@ -1,29 +1,27 @@
 import { supabase } from "./supabase.js";
 
-// Pegar o ID da viagem da URL
 const params = new URLSearchParams(window.location.search);
 const viagemId = params.get("id");
 
-// Elementos do HTML (usando os IDs corretos do viagem.html)
-const banner = document.getElementById("banner");
-const nomeViagem = document.getElementById("nomeViagem");
-const destino = document.getElementById("destino");
-const datas = document.getElementById("datas");
-const descricao = document.getElementById("descricao");
-const dicas = document.getElementById("dicas");
-const pdfLink = document.getElementById("pdfLink");
-const links = document.getElementById("links");
+const bannerEl      = document.getElementById("banner");
+const nomeViagemEl  = document.getElementById("nomeViagem");
+const destinoEl     = document.getElementById("destino");
+const datasEl       = document.getElementById("datas");
+const descricaoEl   = document.getElementById("descricao");
+const roteiroDiasEl = document.getElementById("roteiroDias");
+const dicasEl       = document.getElementById("dicas");
+const linksEl       = document.getElementById("links");
+const pdfLinkEl     = document.getElementById("pdfLink");
 
 async function carregarViagem() {
   if (!viagemId) {
-    if (nomeViagem) nomeViagem.textContent = "Erro: ID da viagem não encontrado na URL";
+    nomeViagemEl.textContent = "Viagem não encontrada (sem ID na URL)";
     return;
   }
 
-  console.log("🔍 Carregando viagem ID:", viagemId);
-
   try {
-    const { data: viagem, error } = await supabase
+    // 1) Buscar dados da viagem
+    const { data: viagem, error: erroViagem } = await supabase
       .from("viagens")
       .select(`
         id,
@@ -43,72 +41,118 @@ async function carregarViagem() {
       .eq("id", viagemId)
       .maybeSingle();
 
-    if (error || !viagem) {
-      console.error("❌ Erro ao buscar viagem:", error);
-      if (nomeViagem) nomeViagem.textContent = "Erro ao carregar viagem";
+    if (erroViagem || !viagem) {
+      console.error("Erro ao buscar viagem:", erroViagem);
+      nomeViagemEl.textContent = "Erro ao carregar viagem";
       return;
     }
 
-    console.log("✅ Viagem carregada:", viagem);
+    // 2) Buscar roteiro dia a dia
+    const { data: dias, error: erroDias } = await supabase
+      .from("roteiro_dias")
+      .select("dia, titulo, descricao")
+      .eq("viagem_id", viagemId)
+      .order("dia", { ascending: true });
 
-    // Preencher dados
-    if (nomeViagem) {
-      nomeViagem.textContent = viagem.nome_viagem || "Viagem";
+    if (erroDias) {
+      console.error("Erro ao buscar roteiro_dias:", erroDias);
     }
 
-    if (destino && viagem.destinos) {
-      destino.textContent = `${viagem.destinos.nome} - ${viagem.destinos.pais}`;
-    }
+    montarCabecalho(viagem);
+    montarRoteiro(viagem, dias || []);
+    montarInfos(viagem);
 
-    if (datas) {
-      datas.textContent = `${formatarData(viagem.data_saida)} até ${formatarData(viagem.data_retorno)}`;
-    }
-
-    // Banner (imagem de fundo)
-    if (banner && viagem.destinos?.imagem_capa_url) {
-      banner.style.backgroundImage = `url(${viagem.destinos.imagem_capa_url})`;
-    }
-
-    // Roteiro
-    if (descricao) {
-      descricao.textContent = viagem.roteiro_texto || "Roteiro disponível no PDF abaixo.";
-    }
-
-    // Dicas
-    if (dicas) {
-      dicas.textContent = viagem.dicas || "Nenhuma dica cadastrada ainda.";
-    }
-
-    // PDF
-    if (pdfLink) {
-      if (viagem.pdf_url) {
-        pdfLink.href = viagem.pdf_url;
-        pdfLink.style.display = "inline-block";
-      } else {
-        pdfLink.style.display = "none";
-      }
-    }
-
-    // Links úteis
-    if (links) {
-      if (viagem.links_uteis) {
-        try {
-          const listaLinks = JSON.parse(viagem.links_uteis);
-          links.innerHTML = listaLinks
-            .map(item => `<p><a href="${item.url}" target="_blank">${item.nome}</a></p>`)
-            .join("");
-        } catch (e) {
-          links.innerHTML = "<p>Erro ao carregar links.</p>";
-        }
-      } else {
-        links.innerHTML = "<p>Nenhum link disponível.</p>";
-      }
-    }
-
-  } catch (erro) {
-    console.error("💥 Erro inesperado:", erro);
-    if (nomeViagem) nomeViagem.textContent = "Erro ao carregar viagem";
+  } catch (e) {
+    console.error("Erro inesperado:", e);
+    nomeViagemEl.textContent = "Erro ao carregar viagem";
   }
+}
+
+function montarCabecalho(viagem) {
+  nomeViagemEl.textContent = viagem.nome_viagem || "Viagem";
+
+  if (viagem.destinos) {
+    destinoEl.textContent = `${viagem.destinos.nome} – ${viagem.destinos.pais}`;
+    if (viagem.destinos.imagem_capa_url) {
+      bannerEl.style.backgroundImage = `url(${viagem.destinos.imagem_capa_url})`;
+    }
+  }
+
+  datasEl.textContent =
+    `${formatarData(viagem.data_saida)} até ${formatarData(viagem.data_retorno)}`;
+}
+
+function montarRoteiro(viagem, dias) {
+  // resumo opcional
+  if (viagem.roteiro_texto) {
+    descricaoEl.textContent = viagem.roteiro_texto;
+  } else {
+    descricaoEl.textContent = "";
+  }
+
+  if (!dias.length) {
+    roteiroDiasEl.innerHTML = "<p>Roteiro dia a dia ainda não cadastrado.</p>";
+    return;
+  }
+
+  roteiroDiasEl.innerHTML = dias
+    .map((d) => {
+      const desc = (d.descricao || "").replace(/\n/g, "<br>");
+      return `
+        <div class="dia-item">
+          <div class="dia-titulo">Dia ${d.dia} – ${d.titulo}</div>
+          <div class="dia-descricao">${desc}</div>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function montarInfos(viagem) {
+  // Dicas
+  if (viagem.dicas) {
+    // Se quiser permitir quebras de linha no texto
+    dicasEl.innerHTML = viagem.dicas.replace(/\n/g, "<br>");
+  } else {
+    dicasEl.textContent = "Nenhuma dica cadastrada ainda.";
+  }
+
+  // PDF
+  if (viagem.pdf_url) {
+    pdfLinkEl.href = viagem.pdf_url;
+    pdfLinkEl.style.display = "inline-block";
+  } else {
+    pdfLinkEl.style.display = "none";
+  }
+
+  // Links úteis
+  if (!viagem.links_uteis) {
+    linksEl.innerHTML = "<p>Nenhum link disponível.</p>";
+    return;
+  }
+
+  let lista = [];
+  try {
+    lista = Array.isArray(viagem.links_uteis)
+      ? viagem.links_uteis
+      : JSON.parse(viagem.links_uteis);
+  } catch (e) {
+    console.error("Erro ao parsear links_uteis:", e);
+    linksEl.innerHTML = "<p>Erro ao carregar links.</p>";
+    return;
+  }
+
+  if (!lista.length) {
+    linksEl.innerHTML = "<p>Nenhum link disponível.</p>";
+    return;
+  }
+
+  linksEl.innerHTML = lista
+    .map(
+      (item) =>
+        `<p><a href="${item.url}" target="_blank" rel="noopener">${item.nome}</a></p>`
+    )
+    .join("");
 }
 
 function formatarData(iso) {
