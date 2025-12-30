@@ -382,12 +382,14 @@ body {
 /* ========================================
    RESPONSIVO
 ======================================== */
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   .logo-img {
-    height: 65px;
+    height: 85px;       /* aumenta a logo */
+    max-width: 200px;   /* garante que não fique gigante */
+    object-fit: contain;
   }
-
-  .viagem-capa {
+}
+ .viagem-capa {
     height: 260px;
   }
 
