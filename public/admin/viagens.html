@@ -1,31 +1,92 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin – Viagens</title>
-<link rel="stylesheet" href="css/admin.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrativo - Viagens | O Bom Guru</title>
+  <link rel="stylesheet" href="/css/admin.css">
 </head>
-<body class="admin-page">
+<body>
+  <header class="admin-header">
+    <div class="container">
+      <div class="header-content">
+        <h1>🌍 Painel Administrativo – Viagens</h1>
+        <nav class="admin-nav">
+          <a href="/admin/viagens.html" class="nav-link active">📋 Viagens</a>
+          <a href="/admin/clientes.html" class="nav-link">👥 Clientes</a>
+          <button id="btnSair" class="btn-sair">Sair</button>
+        </nav>
+      </div>
+    </div>
+  </header>
 
-<header class="admin-header">
-  <div class="container">
-    <h1>🌍 Painel Administrativo – Viagens</h1>
-    <button class="btn-logout" onclick="logout()">Sair</button>
+  <main class="admin-main">
+    <div class="container">
+      <div class="page-header">
+        <h2>Viagens Cadastradas</h2>
+        <button id="btnNovaViagem" class="btn btn-primary">+ Nova Viagem</button>
+      </div>
+
+      <div id="listaViagens" class="viagens-grid">
+        <!-- Viagens carregadas via JS -->
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Nova/Editar Viagem -->
+  <div id="modalViagem" class="modal">
+    <div class="modal-content modal-large">
+      <span class="close">&times;</span>
+      <h3 id="modalTitulo">Nova Viagem</h3>
+      <form id="formViagem">
+        <input type="hidden" id="viagemId">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="viagemTitulo">Título da Viagem *</label>
+            <input type="text" id="viagemTitulo" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="viagemDataInicio">Data de Início *</label>
+            <input type="date" id="viagemDataInicio" required>
+          </div>
+          <div class="form-group">
+            <label for="viagemDataFim">Data de Término *</label>
+            <input type="date" id="viagemDataFim" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="viagemImagem">URL da Imagem de Capa</label>
+          <input type="url" id="viagemImagem" placeholder="https://exemplo.com/imagem.jpg">
+        </div>
+
+        <div class="form-group">
+          <label for="viagemRoteiro">Roteiro Detalhado (dia a dia) *</label>
+          <textarea id="viagemRoteiro" rows="10" required placeholder="Dia 1: ...&#10;Dia 2: ..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="viagemDicas">Dicas e Informações Úteis</label>
+          <textarea id="viagemDicas" rows="5" placeholder="Dicas de bagagem, clima, documentação..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="viagemLinkPdf">Link do PDF do Roteiro</label>
+          <input type="url" id="viagemLinkPdf" placeholder="https://exemplo.com/roteiro.pdf">
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" id="btnCancelar">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+      </form>
+    </div>
   </div>
-</header>
 
-<div class="admin-content">
-  <div class="card">
-    <h2>Viagens Cadastradas</h2>
-    <button class="btn-secondary" onclick="criarViagem()">➕ Nova Viagem</button>
-  </div>
-
-  <div id="listaViagens" class="card">
-    <p>Carregando viagens...</p>
-  </div>
-</div>
-
-<script type="module" src="../js/admin/viagens.js"></script>
+  <script type="module" src="/js/admin-viagens.js"></script>
 </body>
 </html>
