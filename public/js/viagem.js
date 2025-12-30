@@ -1,6 +1,6 @@
 import { supabase } from "./supabase.js";
 
-const params   = new URLSearchParams(window.location.search);
+const params = new URLSearchParams(window.location.search);
 const viagemId = params.get("id");
 
 const bannerEl      = document.getElementById("banner");
@@ -15,12 +15,12 @@ const pdfLinkEl     = document.getElementById("pdfLink");
 
 async function carregarViagem() {
   if (!viagemId) {
-    nomeViagemEl.textContent = "Viagem não encontrada (sem ID)";
+    nomeViagemEl.textContent = "Viagem não encontrada (sem ID na URL)";
     return;
   }
 
   try {
-    // 1) Buscar viagem
+    // 1. Buscar viagem
     const { data: viagem, error: erroViagem } = await supabase
       .from("viagens")
       .select(`
@@ -47,7 +47,7 @@ async function carregarViagem() {
       return;
     }
 
-    // 2) Buscar roteiro dia a dia
+    // 2. Buscar roteiro dia a dia
     const { data: dias, error: erroDias } = await supabase
       .from("roteiro_dias")
       .select("dia, titulo, descricao")
@@ -58,36 +58,36 @@ async function carregarViagem() {
       console.error("Erro ao buscar roteiro_dias:", erroDias);
     }
 
-    montarCabecalho(viagem);
-    montarRoteiro(dias || []);
-    montarCards(viagem);
+    preencherCabecalho(viagem);
+    preencherRoteiro(dias || []);
+    preencherCards(viagem);
 
-  } catch (e) {
-    console.error("Erro inesperado:", e);
+  } catch (err) {
+    console.error("Erro inesperado:", err);
     nomeViagemEl.textContent = "Erro ao carregar viagem";
   }
 }
 
-function montarCabecalho(viagem) {
+function preencherCabecalho(viagem) {
   nomeViagemEl.textContent = viagem.nome_viagem || "";
 
   const saida   = formatarData(viagem.data_saida);
   const retorno = formatarData(viagem.data_retorno);
   datasEl.textContent = saida && retorno ? `${saida} → ${retorno}` : "";
 
-  if (viagem.destinos && viagem.destinos.imagem_capa_url) {
+  if (viagem.destinos?.imagem_capa_url) {
     bannerEl.style.backgroundImage = `url(${viagem.destinos.imagem_capa_url})`;
   }
 }
 
-function montarRoteiro(dias) {
+function preencherRoteiro(dias) {
   if (!dias.length) {
     roteiroDiasEl.innerHTML = "<p>Roteiro dia a dia não cadastrado.</p>";
     return;
   }
 
   roteiroDiasEl.innerHTML = dias
-    .map(d => {
+    .map((d) => {
       const desc = (d.descricao || "").replace(/\n/g, "<br>");
       return `
         <div class="dia-item">
@@ -99,27 +99,19 @@ function montarRoteiro(dias) {
     .join("");
 }
 
-function montarCards(viagem) {
+function preencherCards(viagem) {
   // Dicas
-  if (viagem.dicas) {
-    dicasEl.innerHTML = viagem.dicas.replace(/\n/g, "<br>");
-  } else {
-    dicasEl.textContent = "Nenhuma dica cadastrada.";
-  }
+  dicasEl.innerHTML = (viagem.dicas || "Sem dicas cadastradas.").replace(/\n/g, "<br>");
 
   // Clima
-  if (viagem.clima) {
-    climaEl.textContent = viagem.clima;
-  } else {
-    climaEl.textContent = "Informação de clima não cadastrada.";
-  }
+  climaEl.textContent = viagem.clima || "Informação de clima não cadastrada.";
 
-  // Mapa – por enquanto apenas texto, depois podemos trocar por iframe
-  mapaEl.innerHTML = "<p>Mapa da rota será adicionado aqui em breve.</p>";
+  // Mapa (placeholder por enquanto)
+  mapaEl.innerHTML = "Mapa interativo em breve.";
 
   // Links úteis
   if (!viagem.links_uteis) {
-    linksEl.innerHTML = "<p>Nenhum link disponível.</p>";
+    linksEl.innerHTML = "Nenhum link disponível.";
   } else {
     let lista = [];
     try {
@@ -127,26 +119,27 @@ function montarCards(viagem) {
         ? viagem.links_uteis
         : JSON.parse(viagem.links_uteis);
     } catch (e) {
-      console.error("Erro ao parsear links_uteis:", e);
-      linksEl.innerHTML = "<p>Erro ao carregar links.</p>";
+      console.error("Erro parseando links_uteis:", e);
+      linksEl.innerHTML = "Erro ao carregar links.";
       return;
     }
 
     if (!lista.length) {
-      linksEl.innerHTML = "<p>Nenhum link disponível.</p>";
+      linksEl.innerHTML = "Nenhum link disponível.";
     } else {
-      linksEl.innerHTML = lista        .map(
-          item =>
-            `<p><a href="${item.url}" target="_blank" rel="noopener">${item.nome}</a></p>`
+      linksEl.innerHTML = lista
+        .map(
+          (item) =>
+            `<div style="margin-bottom:6px;"><a href="${item.url}" target="_blank" rel="noopener">→ ${item.nome}</a></div>`
         )
         .join("");
     }
   }
 
-  // PDF – só mostra botão se houver URL
+  // PDF
   if (viagem.pdf_url) {
     pdfLinkEl.href = viagem.pdf_url;
-    pdfLinkEl.style.display = "inline-block";
+    pdfLinkEl.style.display = "block";
   } else {
     pdfLinkEl.style.display = "none";
   }
