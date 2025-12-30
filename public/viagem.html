@@ -1,92 +1,121 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Detalhes da Viagem – ObomGuru</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css" />
   <style>
     .banner {
       width: 100%;
-      height: 260px;
+      height: 220px;
       background-size: cover;
       background-position: center;
       border-radius: 10px;
       margin-bottom: 20px;
     }
-
     .conteudo {
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
-      padding: 20px;
+      padding: 16px;
     }
-
-    h2 {
-      color: #2d5016;
-      margin-bottom: 5px;
-    }
-
     .info-bloco {
       background: #fff;
-      padding: 18px;
-      margin-top: 20px;
+      padding: 16px 18px;
+      margin-top: 18px;
       border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     }
-
     .info-bloco h3 {
-      margin-bottom: 10px;
+      margin: 0 0 10px;
       color: #2d5016;
     }
-
+    .dia-item {
+      border-bottom: 1px solid #eee;
+      padding: 10px 0;
+    }
+    .dia-item:last-child { border-bottom: none; }
+    .dia-titulo {
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #2d5016;
+    }
+    .dia-descricao {
+      font-size: 0.95rem;
+      color: #444;
+      line-height: 1.5;
+    }
+    .cards-infos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .card-info {
+      background: #f7faf5;
+      border-radius: 8px;
+      padding: 10px 12px;
+      border: 1px solid #e2e8d8;
+      font-size: 0.95rem;
+    }
+    .card-info h4 {
+      margin: 0 0 6px;
+      font-size: 0.98rem;
+      color: #2d5016;
+    }
     .btn-pdf {
       display: inline-block;
       background: #2d5016;
-      color: white;
-      padding: 12px 18px;
-      margin-top: 15px;
+      color: #fff;
+      padding: 10px 16px;
       border-radius: 8px;
       text-decoration: none;
+      margin-top: 12px;
+      font-size: 0.95rem;
     }
-
   </style>
 </head>
 <body>
 
-  <header class="header">
-    <img src="img/logo.png" class="logo">
-  </header>
+<header class="header">
+  <img src="img/logo.png" class="logo" />
+</header>
 
-  <div class="conteudo">
+<div class="conteudo">
+  <div id="banner" class="banner"></div>
 
-    <div id="banner" class="banner"></div>
+  <h2 id="nomeViagem"></h2>
+  <p id="destino"></p>
+  <p><strong>Datas:</strong> <span id="datas"></span></p>
 
-    <h2 id="nomeViagem"></h2>
-    <p id="destino"></p>
-    <p><strong>Datas:</strong> <span id="datas"></span></p>
-
-    <!-- BLOCO ROTEIRO -->
-    <div class="info-bloco">
-      <h3>Roteiro Completo</h3>
-      <p id="descricao"></p>
-      <a id="pdfLink" class="btn-pdf" target="_blank">Abrir Roteiro (PDF)</a>
-    </div>
-
-    <!-- BLOCO DICAS -->
-    <div class="info-bloco">
-      <h3>Dicas Úteis</h3>
-      <p id="dicas"></p>
-    </div>
-
-    <!-- BLOCO LINKS -->
-    <div class="info-bloco">
-      <h3>Links Importantes</h3>
-      <div id="links"></div>
-    </div>
-
+  <!-- Roteiro dia a dia -->
+  <div class="info-bloco">
+    <h3>Roteiro dia a dia</h3>
+    <!-- opcional: um parágrafo de resumo -->
+    <p id="descricao"></p>
+    <div id="roteiroDias"></div>
   </div>
 
-  <script type="module" src="js/viagem.js"></script>
+  <!-- Cards de informações -->
+  <div class="info-bloco">
+    <h3>Informações úteis</h3>
+    <div class="cards-infos">
+      <div class="card-info">
+        <h4>Dicas gerais</h4>
+        <p id="dicas"></p>
+      </div>
+      <div class="card-info">
+        <h4>Links & Mapas</h4>
+        <div id="links"></div>
+      </div>
+      <div class="card-info">
+        <h4>Roteiro em PDF</h4>
+        <p>Veja o roteiro completo em PDF.</p>
+        <a id="pdfLink" class="btn-pdf" target="_blank">Abrir PDF</a>
+      </div>
+    </div>
+  </div>
+</div>
 
+<script type="module" src="js/viagem.js"></script>
 </body>
 </html>
