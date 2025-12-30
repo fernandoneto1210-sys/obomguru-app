@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Roteiro da Viagem – ObomGuru</title>
   <link rel="stylesheet" href="css/style.css" />
-  <style>
+    <style>
     * {
       margin: 0;
       padding: 0;
@@ -13,72 +13,102 @@
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #e5edf0; /* cinza bem claro */
       min-height: 100vh;
       padding: 20px;
     }
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      background: #fff;
+      background: #ffffff;
       border-radius: 24px;
       overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      box-shadow: 0 14px 40px rgba(0,0,0,0.18);
+      border: 1px solid #d0dde3;
     }
+
+    /* TOPO COM IMAGEM + BARRA VERDE */
     .banner {
       width: 100%;
-      height: 320px;
+      height: 260px;
       background-size: cover;
       background-position: center;
       position: relative;
     }
-    .banner::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 100px;
-      background: linear-gradient(to top, rgba(255,255,255,1), transparent);
+    .top-bar {
+      background: #1f7a4d; /* verde principal */
+      color: #f7fafc;
+      padding: 16px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      position: relative;
     }
-    .header {
-      padding: 24px 32px 16px;
+    .top-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
       text-align: center;
     }
-    .header h1 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      color: #1a202c;
-      margin-bottom: 8px;
-      letter-spacing: 0.5px;
+    .top-subtitle {
+      font-size: 0.95rem;
+      opacity: 0.9;
+      text-align: center;
     }
-    .header .datas {
-      font-size: 1.1rem;
-      color: #718096;
-      font-weight: 500;
+    .top-dates {
+      position: absolute;
+      right: 32px;
+      top: 50%;
+      transform: translateY(-50%);
+      text-align: right;
+      font-size: 0.9rem;
+      line-height: 1.4;
     }
+
     .content {
       display: grid;
       grid-template-columns: 1.8fr 1fr;
       gap: 24px;
-      padding: 0 32px 32px;
+      padding: 24px 32px 28px;
     }
+
+    /* BLOCO ESQUERDO – ROTEIRO */
     .section {
       background: #f7fafc;
-      border-radius: 16px;
-      padding: 20px 24px;
+      border-radius: 18px;
+      padding: 18px 22px;
+      border: 1px solid #d8e2eb;
     }
-    .section h2 {
-      font-size: 1.3rem;
-      color: #2d3748;
-      margin-bottom: 16px;
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .section-header span.icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: #1f7a4d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+    .section-header h2 {
+      font-size: 1.1rem;
+      color: #1f2a40; /* azul bem escuro */
       font-weight: 600;
-      border-bottom: 3px solid #667eea;
-      padding-bottom: 8px;
+      border-bottom: 2px solid #1f7a4d;
+      padding-bottom: 4px;
+      flex: 1;
     }
+
     .dia-item {
-      margin-bottom: 20px;
-      padding-bottom: 16px;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
       border-bottom: 1px solid #e2e8f0;
     }
     .dia-item:last-child {
@@ -86,104 +116,111 @@
     }
     .dia-titulo {
       font-weight: 700;
-      color: #2d3748;
-      font-size: 1.05rem;
-      margin-bottom: 6px;
+      color: #1f2a40;
+      font-size: 0.98rem;
+      margin-bottom: 4px;
     }
     .dia-descricao {
       color: #4a5568;
+      font-size: 0.9rem;
       line-height: 1.7;
-      font-size: 0.95rem;
     }
+
+    /* COLUNA DIREITA – CARDS */
     .cards-sidebar {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
     .card {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #fff;
-      border-radius: 14px;
-      padding: 16px 18px;
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      background: linear-gradient(135deg, #273a59 0%, #3d4c7a 100%); /* azul escuro */
+      color: #f7fafc;
+      border-radius: 16px;
+      padding: 14px 16px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.35);
+      font-size: 0.9rem;
     }
     .card h3 {
-      font-size: 1rem;
-      margin-bottom: 10px;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
       font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
       opacity: 0.95;
     }
     .card p, .card div {
-      font-size: 0.9rem;
       line-height: 1.6;
       opacity: 0.9;
     }
     .card a {
-      color: #fff;
+      color: #e2ffcc;
       text-decoration: underline;
       font-weight: 500;
     }
+
     .btn-pdf {
       display: block;
       width: 100%;
       text-align: center;
-      background: #48bb78;
+      background: #1f7a4d;
       color: #fff;
-      padding: 14px 0;
-      border-radius: 12px;
+      padding: 12px 0;
+      border-radius: 999px;
       text-decoration: none;
       font-weight: 600;
-      font-size: 1rem;
-      box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
-      transition: all 0.3s ease;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 12px rgba(18, 94, 60, 0.45);
+      margin-top: 4px;
+      transition: all 0.2s ease;
     }
     .btn-pdf:hover {
-      background: #38a169;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(72, 187, 120, 0.5);
+      background: #17633e;
+      transform: translateY(-1px);
     }
 
-    /* RESPONSIVO MOBILE */
+    /* RESPONSIVO */
     @media (max-width: 768px) {
       body {
         padding: 0;
-        background: #fff;
+        background: #ffffff;
       }
       .container {
         border-radius: 0;
         box-shadow: none;
+        border: none;
       }
       .banner {
-        height: 220px;
+        height: 200px;
       }
-      .header {
-        padding: 20px 16px 12px;
+      .top-bar {
+        padding: 14px 16px 40px;
       }
-      .header h1 {
-        font-size: 1.6rem;
+      .top-title {
+        font-size: 1.2rem;
       }
-      .header .datas {
-        font-size: 0.95rem;
+      .top-subtitle {
+        font-size: 0.85rem;
+      }
+      .top-dates {
+        position: static;
+        transform: none;
+        margin-top: 4px;
+        text-align: center;
+        font-size: 0.85rem;
       }
       .content {
         grid-template-columns: 1fr;
-        padding: 0 16px 24px;
-        gap: 16px;
+        padding: 18px 16px 20px;
       }
       .section {
-        padding: 16px 18px;
+        padding: 14px 14px;
       }
-      .section h2 {
-        font-size: 1.15rem;
-      }
-      .dia-titulo {
-        font-size: 0.98rem;
-      }
-      .dia-descricao {
-        font-size: 0.9rem;
+      .cards-sidebar {
+        gap: 10px;
       }
     }
   </style>
+
 </head>
 <body>
   <div class="container">
@@ -233,3 +270,4 @@
   <script type="module" src="js/viagem.js"></script>
 </body>
 </html>
+
