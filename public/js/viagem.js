@@ -54,7 +54,12 @@ async function carregarViagem() {
   // ===== IMAGEM DE CAPA (LOGO POR ENQUANTO) =====
   const imgEl = document.getElementById("imgCapaViagem");
   if (imgEl) {
-    imgEl.src = "/img/logo.png";
+    if (viagem.imagem_capa) {
+  imgEl.src = viagem.imagem_capa;
+} else {
+  imgEl.src = "/img/default-capa.jpg";
+}
+;
     imgEl.alt = titulo;
   }
 
@@ -173,3 +178,4 @@ document
 
 carregarViagem();
 carregarChecklist();
+
