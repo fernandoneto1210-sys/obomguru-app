@@ -3,19 +3,30 @@ import { supabase } from "./supabase.js";
 const params = new URLSearchParams(window.location.search);
 const viagemId = params.get("id");
 
-if (!viagemId) {
-  const erroEl = document.getElementById("erroViagem");
-  if (erroEl) {
-    erroEl.textContent = "ID da viagem não informado.";
-    erroEl.style.display = "block";
-  }
+const erroEl = document.getElementById("erroViagem");
+
+if (!viagemId && erroEl) {
+  erroEl.textContent = "ID da viagem não informado.";
+  erroEl.style.display = "block";
+}
+
+// =======================
+// FORMATAÇÃO DE DATA
+// =======================
+function formatarData(valor) {
+  if (!valor) return "";
+  const d = new Date(valor + "T00:00:00");
+  if (isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("pt-BR");
 }
 
 // =======================
 // CARREGAR VIAGEM
 // =======================
 async function carregarViagem() {
-  console.log("🔎 Carregando viagem com id:", viagemId);
+  if (!viagemId) return;
+
+  console.log("Carregando viagem:", viagemId);
 
   const { data: viagem, error } = await supabase
     .from("viagens")
@@ -23,12 +34,10 @@ async function carregarViagem() {
     .eq("id", viagemId)
     .single();
 
-  console.log("📦 Dados da viagem:", viagem);
-
-  const erroEl = document.getElementById("erroViagem");
+  console.log("Viagem:", viagem, "Erro:", error);
 
   if (error || !viagem) {
-    console.error("❌ Erro ao buscar viagem:", error);
+    console.error(error);
     if (erroEl) {
       erroEl.textContent = "Viagem não encontrada.";
       erroEl.style.display = "block";
@@ -36,9 +45,12 @@ async function carregarViagem() {
     return;
   }
 
+  if (erroEl) erroEl.style.display = "none";
+
   // ===== TÍTULO =====
   const titulo = viagem.nome_viagem || "Viagem";
-  document.title = titulo + " | Oficina de Turismo";
+  document.title = `${titulo} | Oficina de Turismo`;
+
   const tituloPage = document.getElementById("tituloViagem");
   const tituloCapa = document.getElementById("tituloViagemCapa");
   if (tituloPage) tituloPage.textContent = titulo;
@@ -52,18 +64,31 @@ async function carregarViagem() {
     datasEl.textContent = `${saida} a ${retorno}`;
   }
 
-  // ===== IMAGEM DE CAPA (DO STORAGE DO SUPABASE) =====
+  // ===== IMAGEM DE CAPA (SUPABASE STORAGE) =====
   const capaEl = document.getElementById("capaViagem");
-  if (capaEl && viagem.imagem_url) {
-    // Monta a URL completa do Supabase Storage
-    const { data: publicUrl } = supabase.storage
-      .from("imagens")
-      .getPublicUrl(viagem.imagem_url);
+  if (capaEl) {
+    // coluna no banco com o NOME DO ARQUIVO no bucket 'imagens'
+    // ex: "londres.jpg", "africa-do-sul.jpg", "Punta-Cana-O-que-Fazer-....jpg"
+    const caminhoImagem = viagem.imagem_capa; // SE A COLUNA TIVER OUTRO NOME, TROCAR AQUI
 
-    if (publicUrl && publicUrl.publicUrl) {
-      capaEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url(${publicUrl.publicUrl})`;
-      capaEl.style.backgroundSize = "cover";
-      capaEl.style.backgroundPosition = "center";
+    if (caminhoImagem) {
+      const { data } = supabase.storage
+        .from("imagens")
+        .getPublicUrl(caminhoImagem);
+
+      if (data && data.publicUrl) {
+        capaEl.style.backgroundImage = `
+          linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.65)),
+          url('${data.publicUrl}')
+        `;
+        capaEl.style.backgroundSize = "cover";
+        capaEl.style.backgroundPosition = "center";
+      } else {
+        // fallback – só o gradiente claro
+        capaEl.style.backgroundImage = "linear-gradient(135deg, #e8f0f5, #d4e4f0)";
+      }
+    } else {
+      capaEl.style.backgroundImage = "linear-gradient(135deg, #e8f0f5, #d4e4f0)";
     }
   }
 
@@ -71,7 +96,7 @@ async function carregarViagem() {
   const roteiroEl = document.getElementById("roteiroTexto");
   if (roteiroEl) {
     const texto = viagem.roteiro_texto;
-    if (texto && texto.trim().length > 0) {
+    if (texto && texto.trim()) {
       roteiroEl.innerHTML = texto
         .split("\n")
         .map(l => l.trim())
@@ -88,7 +113,7 @@ async function carregarViagem() {
   if (dicasEl) {
     dicasEl.innerHTML = "";
 
-    if (viagem.dicas && viagem.dicas.trim().length > 0) {
+    if (viagem.dicas && viagem.dicas.trim()) {
       dicasEl.innerHTML += `
         <div class="dica-box">
           <h3>Informações Gerais</h3>
@@ -101,7 +126,7 @@ async function carregarViagem() {
       `;
     }
 
-    if (viagem.informacoes_uteis && viagem.informacoes_uteis.trim().length > 0) {
+    if (viagem.informacoes_uteis && viagem.informacoes_uteis.trim()) {
       dicasEl.innerHTML += `
         <div class="dica-box">
           <h3>Informações Úteis</h3>
@@ -120,136 +145,75 @@ async function carregarViagem() {
   }
 
   // ===== BOTÃO PDF DO ROTEIRO =====
-  const btnPdf = document.getElementById("btnGerarPdfRoteiro");
-  if (btnPdf) {
-    btnPdf.onclick = () => gerarPdfRoteiro(titulo, viagem.roteiro_texto);
+  const btnPdfRoteiro = document.getElementById("btnGerarPdfRoteiro");
+  if (btnPdfRoteiro) {
+    btnPdfRoteiro.onclick = () =>
+      gerarPdfRoteiro(titulo, viagem.roteiro_texto || "");
   }
 
-  // ===== WHATSAPP GUIA =====
+  // ===== WHATSAPP GUIA (OPCIONAL) =====
   const linkWhats = document.querySelector('a[href*="wa.me"]');
   if (linkWhats && viagem.guia_whatsapp) {
     const numero = viagem.guia_whatsapp.replace(/\D/g, "");
     if (numero) linkWhats.href = `https://wa.me/${numero}`;
   }
-}
 
-function formatarData(valor) {
-  if (!valor) return "";
-  const d = new Date(valor + "T00:00:00");
-  if (isNaN(d.getTime())) return "";
-  return d.toLocaleDateString("pt-BR");
+  carregarChecklist();
 }
 
 // =======================
-// GERAR PDF DO ROTEIRO (COM MÚLTIPLAS PÁGINAS)
+// PDF DO ROTEIRO (MÚLTIPLAS PÁGINAS)
 // =======================
 function gerarPdfRoteiro(titulo, roteiro) {
-  if (!roteiro || roteiro.trim().length === 0) {
+  if (!roteiro || !roteiro.trim()) {
     alert("Roteiro não disponível para gerar PDF.");
     return;
   }
 
   try {
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF();
+    const pdf = new jsPDF({ unit: "mm", format: "a4" });
 
-    const margemEsquerda = 10;
-    const margemDireita = 10;
-    const larguraPagina = 210; // A4
-    const larguraTexto = larguraPagina - margemEsquerda - margemDireita;
-    let y = 15;
+    const marginLeft = 15;
+    const marginTop = 20;
+    const lineHeight = 6;
+    const maxLineWidth = 180;
+    const pageHeight = 297;
+    const bottomMargin = 20;
 
-    // TÍTULO
-    pdf.setFontSize(18);
+    pdf.setFontSize(16);
     pdf.setFont(undefined, "bold");
-    pdf.text(titulo, margemEsquerda, y);
-    y += 10;
+    pdf.text(titulo, marginLeft, marginTop);
 
-    // ROTEIRO
+    let y = marginTop + 10;
+
     pdf.setFontSize(11);
     pdf.setFont(undefined, "normal");
 
     const linhas = roteiro.split("\n").filter(l => l.trim());
 
     linhas.forEach(linha => {
-      const textoQuebrado = pdf.splitTextToSize(linha, larguraTexto);
-
-      textoQuebrado.forEach(pedaco => {
-        if (y > 280) { // Fim da página
+      const partes = pdf.splitTextToSize(linha, maxLineWidth);
+      partes.forEach(p => {
+        if (y + lineHeight > pageHeight - bottomMargin) {
           pdf.addPage();
-          y = 15;
+          y = marginTop;
         }
-        pdf.text(pedaco, margemEsquerda, y);
-        y += 6;
+        pdf.text(p, marginLeft, y);
+        y += lineHeight;
       });
-
-      y += 2; // Espaço entre parágrafos
+      y += 2; // espaço entre parágrafos
     });
 
     pdf.save(`${titulo.replace(/[^a-z0-9]/gi, "_")}_roteiro.pdf`);
-  } catch (error) {
-    console.error("Erro ao gerar PDF:", error);
-    alert("Erro ao gerar PDF. Tente novamente.");
+  } catch (e) {
+    console.error("Erro ao gerar PDF do roteiro:", e);
+    alert("Erro ao gerar PDF do roteiro.");
   }
 }
 
 // =======================
-// GERAR PDF DO CHECKLIST (COM MÚLTIPLAS PÁGINAS)
-// =======================
-function gerarPdfChecklist() {
-  try {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF();
-
-    const margemEsquerda = 10;
-    let y = 15;
-
-    pdf.setFontSize(18);
-    pdf.setFont(undefined, "bold");
-    pdf.text("Checklist da Viagem", margemEsquerda, y);
-    y += 15;
-
-    pdf.setFontSize(11);
-
-    document.querySelectorAll(".checklist-card").forEach(card => {
-      const categoria = card.querySelector("h3").textContent;
-
-      if (y > 270) {
-        pdf.addPage();
-        y = 15;
-      }
-
-      pdf.setFont(undefined, "bold");
-      pdf.text(categoria, margemEsquerda, y);
-      y += 8;
-
-      pdf.setFont(undefined, "normal");
-      card.querySelectorAll("label").forEach(label => {
-        const checkbox = label.querySelector(".checklist-item");
-        const texto = label.textContent.trim();
-        const marcado = checkbox.checked ? "[X]" : "[ ]";
-
-        if (y > 280) {
-          pdf.addPage();
-          y = 15;
-        }
-
-        pdf.text(`${marcado} ${texto}`, margemEsquerda + 5, y);
-        y += 6;
-      });
-
-      y += 5;
-    });
-
-    pdf.save("checklist-viagem.pdf");
-  } catch (error) {
-    console.error("Erro ao gerar PDF:", error);
-    alert("Erro ao gerar PDF. Tente novamente.");
-  }
-}
-
-// =======================
-// CHECKLIST - SALVAR NO LOCALSTORAGE
+// CHECKLIST – LOCALSTORAGE
 // =======================
 function salvarChecklist() {
   if (!viagemId) return;
@@ -271,25 +235,74 @@ function carregarChecklist() {
 }
 
 // =======================
-// EVENT LISTENERS
+// PDF DO CHECKLIST
 // =======================
-document.querySelectorAll(".checklist-item").forEach(cb => {
-  cb.addEventListener("change", salvarChecklist);
-});
+function gerarPdfChecklist() {
+  try {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
 
+    let y = 15;
+    pdf.setFontSize(18);
+    pdf.setFont(undefined, "bold");
+    pdf.text("Checklist da Viagem", 10, y);
+    y += 15;
+
+    document.querySelectorAll(".checklist-card").forEach(card => {
+      const categoria = card.querySelector("h3").textContent;
+
+      if (y > 270) {
+        pdf.addPage();
+        y = 15;
+      }
+
+      pdf.setFontSize(14);
+      pdf.setFont(undefined, "bold");
+      pdf.text(categoria, 10, y);
+      y += 10;
+
+      pdf.setFontSize(12);
+      pdf.setFont(undefined, "normal");
+
+      card.querySelectorAll("label").forEach(label => {
+        const cb = label.querySelector("input");
+        const marcado = cb.checked ? "[X]" : "[ ]";
+        const texto = label.innerText.trim();
+
+        if (y > 280) {
+          pdf.addPage();
+          y = 15;
+        }
+
+        pdf.text(`${marcado} ${texto}`, 15, y);
+        y += 7;
+      });
+
+      y += 5;
+    });
+
+    pdf.save("checklist-viagem.pdf");
+  } catch (e) {
+    console.error("Erro ao gerar PDF do checklist:", e);
+    alert("Erro ao gerar PDF do checklist.");
+  }
+}
+
+// =======================
+// EVENTOS GERAIS
+// =======================
 document
   .getElementById("btnGerarChecklistPdf")
   ?.addEventListener("click", gerarPdfChecklist);
 
-document
-  .getElementById("btnSairViagem")
-  ?.addEventListener("click", async () => {
-    await supabase.auth.signOut();
-    window.location.href = "/login.html";
-  });
+document.querySelectorAll(".checklist-item").forEach(cb => {
+  cb.addEventListener("change", salvarChecklist);
+});
+
+document.getElementById("btnSairViagem")?.addEventListener("click", async () => {
+  await supabase.auth.signOut();
+  window.location.href = "/login.html";
+});
 
 // =======================
-// INICIAR
-// =======================
 carregarViagem();
-carregarChecklist();
