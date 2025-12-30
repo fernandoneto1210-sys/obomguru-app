@@ -384,10 +384,12 @@ body {
 ======================================== */
 @media (max-width: 480px) {
   .logo-img {
-    height 200px;
-    max-width: 320px;
+    height: 185px;       /* aumenta a logo */
+    max-width: 300px;   /* garante que não fique gigante */
+    object-fit: contain;
   }
 }
+
  .viagem-capa {
     height: 260px;
   }
