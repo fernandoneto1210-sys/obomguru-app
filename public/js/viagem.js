@@ -96,15 +96,44 @@ async function carregarViagem() {
   }
 
   // ===== PDF DO ROTEIRO =====
-  const btnPdf = document.getElementById("btnGerarPdfRoteiro");
-  if (btnPdf) {
-    if (viagem.pdf_url) {
-      btnPdf.textContent = "📄 Baixar PDF do Roteiro";
-      btnPdf.onclick = () => window.open(viagem.pdf_url, "_blank");
-    } else {
-      btnPdf.style.display = "none";
+const btnPdf = document.getElementById("btnGerarPdfRoteiro");
+if (btnPdf) {
+  btnPdf.onclick = async () => {
+    try {
+      // Importa jsPDF dinamicamente
+      const { jsPDF } = await import("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+
+      const pdf = new jsPDF();
+      const titulo = viagem.nome_viagem || "Roteiro de Viagem";
+      const roteiro = viagem.roteiro_texto || "Roteiro não disponível";
+
+      // Título
+      pdf.setFontSize(16);
+      pdf.setFont(undefined, 'bold');
+      pdf.text(titulo, 10, 15);
+
+      // Datas
+      if (viagem.data_saida && viagem.data_retorno) {
+        pdf.setFontSize(10);
+        pdf.setFont(undefined, 'normal');
+        const saida = formatarData(viagem.data_saida);
+        const retorno = formatarData(viagem.data_retorno);
+        pdf.text(`${saida} a ${retorno}`, 10, 25);
+      }
+
+      // Roteiro
+      pdf.setFontSize(11);
+      const linhas = pdf.splitTextToSize(roteiro, 180);
+      pdf.text(linhas, 10, 35);
+
+      // Download
+      pdf.save(`${titulo.replace(/[^a-z0-9]/gi, '_')}_roteiro.pdf`);
+    } catch (error) {
+      console.error("Erro ao gerar PDF:", error);
+      alert("Erro ao gerar PDF. Tente novamente.");
     }
-  }
+  };
+}
 
   // ===== WHATSAPP GUIA =====
   const linkWhats = document.querySelector('a[href*="wa.me"]');
@@ -163,3 +192,4 @@ document
 // =======================
 carregarViagem();
 carregarChecklist();
+
