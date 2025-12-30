@@ -4,27 +4,139 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login – ObomGuru</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/home.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-container {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      padding: 40px;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .login-container h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 30px;
+      font-size: 1.8rem;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: #34495e;
+      margin-bottom: 8px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border 0.3s ease;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .btn-login {
+      width: 100%;
+      background: #27ae60;
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-login:hover {
+      background: #229954;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(39,174,96,0.3);
+    }
+
+    .btn-login:disabled {
+      background: #95a5a6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .error-msg {
+      background: #e74c3c;
+      color: #fff;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .voltar-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .voltar-link a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .voltar-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-  <header class="header">
-    <img src="img/logo.png" alt="ObomGuru" class="logo">
-  </header>
 
-  <section class="login-container">
-    <h2>Acesso do Cliente</h2>
-    <form id="formLogin">
-      <input type="email" name="email" placeholder="Seu e-mail" required>
-      <input type="password" name="senha" placeholder="Sua senha" required>
-      <button type="submit">Entrar</button>
-    </form>
-    <p id="mensagem"></p>
-  </section>
+<div class="login-container">
+  <h2>🔐 Login ObomGuru</h2>
 
-  <footer class="footer">
-    <p>© 2025 ObomGuru</p>
-  </footer>
+  <form id="loginForm">
+    <div id="erroLogin" class="error-msg"></div>
 
-  <script type="module" src="js/auth.js"></script>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" required autocomplete="email" placeholder="seu@email.com">
+    </div>
+
+    <div class="form-group">
+      <label for="senha">Senha</label>
+      <input type="password" id="senha" required autocomplete="current-password" placeholder="••••••••">
+    </div>
+
+    <button type="submit" class="btn-login" id="btnLogin">
+      Entrar
+    </button>
+  </form>
+
+  <div class="voltar-link">
+    <a href="/">← Voltar para o site</a>
+  </div>
+</div>
+
+<script type="module" src="js/login-cliente.js"></script>
 </body>
 </html>
