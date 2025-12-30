@@ -3,125 +3,230 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Detalhes da Viagem</title>
+  <title>Roteiro da Viagem – ObomGuru</title>
   <link rel="stylesheet" href="css/style.css" />
   <style>
-    .conteudo {
-      max-width: 960px;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 16px;
+      background: #fff;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     }
     .banner {
       width: 100%;
-      height: 260px;
-      border-radius: 18px;
+      height: 320px;
       background-size: cover;
       background-position: center;
-      margin-bottom: 20px;
+      position: relative;
     }
-    h1 {
-      margin: 0;
-      font-size: 1.8rem;
+    .banner::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 100px;
+      background: linear-gradient(to top, rgba(255,255,255,1), transparent);
+    }
+    .header {
+      padding: 24px 32px 16px;
       text-align: center;
     }
-    .subtitulo {
-      text-align: center;
-      color: #555;
-      margin-bottom: 24px;
+    .header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
     }
-    .info-bloco {
-      background: #ffffff;
-      border-radius: 18px;
-      padding: 18px 20px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-      margin-bottom: 18px;
-    }
-    .info-bloco h2 {
-      margin: 0 0 12px;
+    .header .datas {
       font-size: 1.1rem;
-      color: #1f3b73;
+      color: #718096;
+      font-weight: 500;
     }
-    .dias-lista .dia-item {
-      margin-bottom: 10px;
+    .content {
+      display: grid;
+      grid-template-columns: 1.8fr 1fr;
+      gap: 24px;
+      padding: 0 32px 32px;
+    }
+    .section {
+      background: #f7fafc;
+      border-radius: 16px;
+      padding: 20px 24px;
+    }
+    .section h2 {
+      font-size: 1.3rem;
+      color: #2d3748;
+      margin-bottom: 16px;
+      font-weight: 600;
+      border-bottom: 3px solid #667eea;
+      padding-bottom: 8px;
+    }
+    .dia-item {
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .dia-item:last-child {
+      border-bottom: none;
     }
     .dia-titulo {
-      font-weight: 600;
-      color: #1f3b73;
+      font-weight: 700;
+      color: #2d3748;
+      font-size: 1.05rem;
+      margin-bottom: 6px;
     }
     .dia-descricao {
+      color: #4a5568;
+      line-height: 1.7;
       font-size: 0.95rem;
-      color: #444;
     }
-    .cards-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
+    .cards-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
     .card {
-      background: #f3f8ff;
-      border-radius: 12px;
-      padding: 10px 12px;
-      font-size: 0.94rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 16px 18px;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     }
     .card h3 {
-      margin: 0 0 6px;
-      font-size: 0.95rem;
-      color: #1f3b73;
+      font-size: 1rem;
+      margin-bottom: 10px;
+      font-weight: 600;
+      opacity: 0.95;
+    }
+    .card p, .card div {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+    .card a {
+      color: #fff;
+      text-decoration: underline;
+      font-weight: 500;
     }
     .btn-pdf {
-      display: inline-block;
+      display: block;
       width: 100%;
       text-align: center;
-      background: #006bff;
+      background: #48bb78;
       color: #fff;
-      border-radius: 999px;
-      padding: 12px 0;
-      margin-top: 14px;
+      padding: 14px 0;
+      border-radius: 12px;
       text-decoration: none;
-      font-size: 0.96rem;
       font-weight: 600;
+      font-size: 1rem;
+      box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+      transition: all 0.3s ease;
     }
-    @media (max-width: 600px) {
-      .banner { height: 200px; border-radius: 0; }
-      .info-bloco { border-radius: 12px; padding: 14px 16px; }
+    .btn-pdf:hover {
+      background: #38a169;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(72, 187, 120, 0.5);
+    }
+
+    /* RESPONSIVO MOBILE */
+    @media (max-width: 768px) {
+      body {
+        padding: 0;
+        background: #fff;
+      }
+      .container {
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .banner {
+        height: 220px;
+      }
+      .header {
+        padding: 20px 16px 12px;
+      }
+      .header h1 {
+        font-size: 1.6rem;
+      }
+      .header .datas {
+        font-size: 0.95rem;
+      }
+      .content {
+        grid-template-columns: 1fr;
+        padding: 0 16px 24px;
+        gap: 16px;
+      }
+      .section {
+        padding: 16px 18px;
+      }
+      .section h2 {
+        font-size: 1.15rem;
+      }
+      .dia-titulo {
+        font-size: 0.98rem;
+      }
+      .dia-descricao {
+        font-size: 0.9rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="conteudo">
+  <div class="container">
     <div id="banner" class="banner"></div>
-    <h1 id="nomeViagem"></h1>
-    <p class="subtitulo"><span id="datas"></span></p>
 
-    <div class="info-bloco">
-      <h2>Roteiro dia a dia</h2>
-      <div id="roteiroDias" class="dias-lista"></div>
+    <div class="header">
+      <h1 id="nomeViagem">Carregando...</h1>
+      <p class="datas" id="datas"></p>
     </div>
 
-    <div class="info-bloco">
-      <div class="cards-grid">
-        <div class="card">
-          <h3>Dicas</h3>
-          <div id="dicas"></div>
-        </div>
-        <div class="card">
-          <h3>Clima (Setembro)</h3>
-          <div id="clima"></div>
-        </div>
-        <div class="card">
-          <h3>Mapa</h3>
-          <div id="mapa">
-            <p>Em breve mapa interativo aqui.</p>
-          </div>
-        </div>
-        <div class="card">
-          <h3>Links úteis</h3>
-          <div id="links"></div>
-        </div>
+    <div class="content">
+      <!-- COLUNA ESQUERDA: Roteiro dia a dia -->
+      <div class="section">
+        <h2>📅 Roteiro Dia a Dia</h2>
+        <div id="roteiroDias">Carregando roteiro...</div>
       </div>
-      <a id="pdfLink" class="btn-pdf" target="_blank" style="display:none;">
-        Abrir PDF completo
-      </a>
+
+      <!-- COLUNA DIREITA: Cards -->
+      <div class="cards-sidebar">
+        <div class="card">
+          <h3>💡 Dicas</h3>
+          <div id="dicas">Carregando...</div>
+        </div>
+
+        <div class="card">
+          <h3>🌡️ Clima</h3>
+          <div id="clima">Carregando...</div>
+        </div>
+
+        <div class="card">
+          <h3>🗺️ Mapa</h3>
+          <div id="mapa">Mapa em breve</div>
+        </div>
+
+        <div class="card">
+          <h3>🔗 Links Úteis</h3>
+          <div id="links">Carregando...</div>
+        </div>
+
+        <a id="pdfLink" class="btn-pdf" target="_blank" style="display:none;">
+          📄 Abrir PDF Completo
+        </a>
+      </div>
     </div>
   </div>
 
