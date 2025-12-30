@@ -1,89 +1,273 @@
-import { supabase } from "./supabase.js";
+/* BASE GERAL */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-const params = new URLSearchParams(window.location.search);
-const viagemId = params.get("id");
+html, body {
+  height: 100%;
+}
 
-//=======================
-// CARREGAR VIAGEM
-//=======================
-async function carregarViagem() {
-  const { data, error } = await supabase
-    .from("viagens")
-    .select("*")
-    .eq("id", viagemId)
-    .single();
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+    sans-serif;
+  background: #f5f7fb;
+  color: #333;
+  line-height: 1.6;
+}
 
-  if (error || !data) {
-    document.getElementById("erroViagem").textContent = "Viagem não encontrada.";
-    document.getElementById("erroViagem").style.display = "block";
-    return;
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* HEADER DA VIAGEM */
+.viagem-header {
+  background: linear-gradient(135deg, #19562f, #0f3b21);
+  color: #fff;
+  padding: 1.5rem 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.logo-emoji {
+  font-size: 1.6rem;
+}
+
+.logo-text {
+  letter-spacing: 0.02em;
+}
+
+/* BOTÕES */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.4rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: #19562f;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #134122;
+  box-shadow: 0 4px 10px rgba(19, 65, 34, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #1f4e79;
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background: #173858;
+  box-shadow: 0 4px 10px rgba(31, 78, 121, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-sair {
+  background: #dc3545;
+  color: #fff;
+}
+
+.btn-sair:hover {
+  background: #b72a37;
+}
+
+/* CAPA DA VIAGEM */
+.viagem-capa {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  overflow: hidden;
+  background: #000;
+}
+
+.viagem-capa img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.capa-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.1),
+    rgba(0, 0, 0, 0.8)
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 2.5rem 3rem;
+  color: #fff;
+}
+
+.capa-overlay h1 {
+  font-size: 2.2rem;
+  margin-bottom: 0.4rem;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.capa-overlay p {
+  font-size: 1.1rem;
+  opacity: 0.95;
+}
+
+/* MAIN */
+.viagem-main {
+  padding: 2.5rem 0 3rem;
+}
+
+.error-msg {
+  display: none;
+  background: #f8d7da;
+  color: #721c24;
+  padding: 1rem 1.2rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #f5c6cb;
+}
+
+/* CARDS */
+.card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px rgba(15, 59, 33, 0.08);
+}
+
+/* TÍTULOS DE SEÇÃO */
+.section-title {
+  font-size: 1.5rem;
+  color: #19562f;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+  border-bottom: 3px solid #19562f;
+  padding-bottom: 0.5rem;
+}
+
+/* ROTEIRO */
+.roteiro-content p {
+  margin-bottom: 0.75rem;
+  font-size: 0.98rem;
+}
+
+/* DICAS */
+.dicas-content p {
+  margin-bottom: 0.75rem;
+  font-size: 0.98rem;
+}
+
+/* CARDS ÚTEIS */
+.cards-section {
+  margin-top: 1rem;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.info-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.8rem 1.6rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.info-card h3 {
+  color: #19562f;
+  margin-bottom: 0.7rem;
+  font-size: 1.2rem;
+}
+
+.info-card p {
+  margin-bottom: 1.2rem;
+  font-size: 0.96rem;
+  color: #444;
+}
+
+/* FOOTER */
+.viagem-footer {
+  background: #0f3b21;
+  color: #fff;
+  text-align: center;
+  padding: 1.4rem 0;
+  font-size: 0.9rem;
+}
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+  .viagem-header {
+    padding: 1rem 0;
   }
 
-  // CABEÇALHO
-  document.getElementById("tituloViagem").textContent = data.titulo;
-  document.getElementById("tituloViagemCapa").textContent = data.titulo;
-  document.getElementById("datasViagem").textContent =
-    formatarData(data.data_inicio) + " a " + formatarData(data.data_fim);
+  .header-content {
+    flex-direction: row;
+    gap: 0.75rem;
+  }
 
-  document.getElementById("imgCapaViagem").src = data.imagem_capa;
+  .logo {
+    font-size: 1.3rem;
+  }
 
-  // ROTEIRO
-  document.getElementById("roteiroTexto").innerHTML =
-    data.roteiro
-      ?.split("\n")
-      .map(l => `<p>${l}</p>`)
-      .join("") || "<p>Roteiro não disponível.</p>";
+  .viagem-capa {
+    height: 260px;
+  }
 
-  // DICAS
-  document.getElementById("dicasViagem").innerHTML =
-    data.dicas
-      ?.split("\n")
-      .map(l => `<p>${l}</p>`)
-      .join("") || "<p>Sem dicas no momento.</p>";
+  .capa-overlay {
+    padding: 1.5rem;
+  }
+
+  .capa-overlay h1 {
+    font-size: 1.6rem;
+  }
+
+  .capa-overlay p {
+    font-size: 0.95rem;
+  }
+
+  .card {
+    padding: 1.6rem 1.4rem;
+  }
+
+  .section-title {
+    font-size: 1.3rem;
+  }
 }
-
-function formatarData(d) {
-  const dt = new Date(d);
-  return dt.toLocaleDateString("pt-BR");
-}
-
-//=======================
-// CHECKLIST
-//=======================
-document.querySelectorAll(".checklist-item").forEach(cb => {
-  cb.addEventListener("change", salvarChecklist);
-});
-
-function salvarChecklist() {
-  const itens = {};
-  document.querySelectorAll(".checklist-item").forEach(cb => {
-    itens[cb.dataset.item] = cb.checked;
-  });
-  localStorage.setItem("checklist_" + viagemId, JSON.stringify(itens));
-}
-
-function carregarChecklist() {
-  const salvo = localStorage.getItem("checklist_" + viagemId);
-  if (!salvo) return;
-  const itens = JSON.parse(salvo);
-  document.querySelectorAll(".checklist-item").forEach(cb => {
-    cb.checked = itens[cb.dataset.item] || false;
-  });
-}
-
-//=======================
-// BOTÃO PDF CHECKLIST
-//=======================
-document.getElementById("btnGerarChecklistPdf")?.addEventListener("click", () => {
-  alert("PDF do checklist será gerado aqui (já configurado).");
-});
-
-//=======================
-document.getElementById("btnSairViagem")?.addEventListener("click", async () => {
-  await supabase.auth.signOut();
-  window.location.href = "/login.html";
-});
-
-//=======================
-carregarViagem();
-carregarChecklist();
